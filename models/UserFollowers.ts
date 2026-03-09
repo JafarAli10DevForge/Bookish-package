@@ -15,12 +15,13 @@ import { HttpFile } from '../http/http';
 export class UserFollowers {
     'follower': Array<string>;
     'following': Array<string>;
+    'requested': Array<string>;
 
     static readonly discriminator: string | undefined = undefined;
 
-    static readonly mapping: {[index: string]: string} | undefined = undefined;
+    static readonly mapping: { [index: string]: string } | undefined = undefined;
 
-    static readonly attributeTypeMap: Array<{name: string, baseName: string, type: string, format: string}> = [
+    static readonly attributeTypeMap: Array<{ name: string, baseName: string, type: string, format: string }> = [
         {
             "name": "follower",
             "baseName": "follower",
@@ -32,7 +33,13 @@ export class UserFollowers {
             "baseName": "following",
             "type": "Array<string>",
             "format": ""
-        }    ];
+        },
+        {
+            "name": "requested",
+            "baseName": "requested",
+            "type": "Array<string>",
+            "format": ""
+        }];
 
     static getAttributeTypeMap() {
         return UserFollowers.attributeTypeMap;
