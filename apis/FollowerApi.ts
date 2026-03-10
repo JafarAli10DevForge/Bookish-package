@@ -189,6 +189,52 @@ export class FollowerApiRequestFactory extends BaseAPIRequestFactory {
     /**
      * @param followerPayloadDto 
      */
+    public async followerControllerIsFriend(followerPayloadDto: FollowerPayloadDto, _options?: Configuration): Promise<RequestContext> {
+        let _config = _options || this.configuration;
+
+        // verify required parameter 'followerPayloadDto' is not null or undefined
+        if (followerPayloadDto === null || followerPayloadDto === undefined) {
+            throw new RequiredError("FollowerApi", "followerControllerIsFriend", "followerPayloadDto");
+        }
+
+
+        // Path Params
+        const localVarPath = '/v1/relationship/isFriend';
+
+        // Make Request Context
+        const requestContext = _config.baseServer.makeRequestContext(localVarPath, HttpMethod.POST);
+        requestContext.setHeaderParam("Accept", "application/json, */*;q=0.8")
+
+
+        // Body Params
+        const contentType = ObjectSerializer.getPreferredMediaType([
+            "application/json"
+        ]);
+        requestContext.setHeaderParam("Content-Type", contentType);
+        const serializedBody = ObjectSerializer.stringify(
+            ObjectSerializer.serialize(followerPayloadDto, "FollowerPayloadDto", ""),
+            contentType
+        );
+        requestContext.setBody(serializedBody);
+
+        let authMethod: SecurityAuthentication | undefined;
+        // Apply auth methods
+        authMethod = _config.authMethods["bearer"]
+        if (authMethod?.applySecurityAuthentication) {
+            await authMethod?.applySecurityAuthentication(requestContext);
+        }
+        
+        const defaultAuth: SecurityAuthentication | undefined = _config?.authMethods?.default
+        if (defaultAuth?.applySecurityAuthentication) {
+            await defaultAuth?.applySecurityAuthentication(requestContext);
+        }
+
+        return requestContext;
+    }
+
+    /**
+     * @param followerPayloadDto 
+     */
     public async followerControllerUnfollow(followerPayloadDto: FollowerPayloadDto, _options?: Configuration): Promise<RequestContext> {
         let _config = _options || this.configuration;
 
@@ -358,6 +404,38 @@ export class FollowerApiResponseProcessor {
                 ObjectSerializer.parse(await response.body.text(), contentType),
                 "FriendRequestItemEntityDto", ""
             ) as FriendRequestItemEntityDto;
+            return new HttpInfo(response.httpStatusCode, response.headers, response.body, body);
+        }
+
+        throw new ApiException<string | Blob | undefined>(response.httpStatusCode, "Unknown API Status Code!", await response.getBodyAsAny(), response.headers);
+    }
+
+    /**
+     * Unwraps the actual response sent by the server from the response context and deserializes the response content
+     * to the expected objects
+     *
+     * @params response Response returned by the server for a request to followerControllerIsFriend
+     * @throws ApiException if the response code was not in [200, 299]
+     */
+     public async followerControllerIsFriendWithHttpInfo(response: ResponseContext): Promise<HttpInfo<FollowerResponseDto >> {
+        const contentType = ObjectSerializer.normalizeMediaType(response.headers["content-type"]);
+        if (isCodeInRange("200", response.httpStatusCode)) {
+            const body: FollowerResponseDto = ObjectSerializer.deserialize(
+                ObjectSerializer.parse(await response.body.text(), contentType),
+                "FollowerResponseDto", ""
+            ) as FollowerResponseDto;
+            return new HttpInfo(response.httpStatusCode, response.headers, response.body, body);
+        }
+        if (isCodeInRange("401", response.httpStatusCode)) {
+            throw new ApiException<undefined>(response.httpStatusCode, "Unauthorized", undefined, response.headers);
+        }
+
+        // Work around for missing responses in specification, e.g. for petstore.yaml
+        if (response.httpStatusCode >= 200 && response.httpStatusCode <= 299) {
+            const body: FollowerResponseDto = ObjectSerializer.deserialize(
+                ObjectSerializer.parse(await response.body.text(), contentType),
+                "FollowerResponseDto", ""
+            ) as FollowerResponseDto;
             return new HttpInfo(response.httpStatusCode, response.headers, response.body, body);
         }
 

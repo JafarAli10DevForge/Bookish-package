@@ -18,6 +18,7 @@ export class SignupPayloadDto {
     'password': string;
     'role'?: string;
     'currency'?: string;
+    'activityStatus'?: SignupPayloadDtoActivityStatusEnum;
 
     static readonly discriminator: string | undefined = undefined;
 
@@ -53,6 +54,12 @@ export class SignupPayloadDto {
             "baseName": "currency",
             "type": "string",
             "format": ""
+        },
+        {
+            "name": "activityStatus",
+            "baseName": "activityStatus",
+            "type": "SignupPayloadDtoActivityStatusEnum",
+            "format": ""
         }    ];
 
     static getAttributeTypeMap() {
@@ -62,3 +69,10 @@ export class SignupPayloadDto {
     public constructor() {
     }
 }
+
+export enum SignupPayloadDtoActivityStatusEnum {
+    Public = 'public',
+    Friends = 'friends',
+    Private = 'private'
+}
+

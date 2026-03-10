@@ -1829,6 +1829,24 @@ export class PromiseFollowerApi {
     /**
      * @param followerPayloadDto
      */
+    public followerControllerIsFriendWithHttpInfo(followerPayloadDto: FollowerPayloadDto, _options?: PromiseConfigurationOptions): Promise<HttpInfo<FollowerResponseDto>> {
+        const observableOptions = wrapOptions(_options);
+        const result = this.api.followerControllerIsFriendWithHttpInfo(followerPayloadDto, observableOptions);
+        return result.toPromise();
+    }
+
+    /**
+     * @param followerPayloadDto
+     */
+    public followerControllerIsFriend(followerPayloadDto: FollowerPayloadDto, _options?: PromiseConfigurationOptions): Promise<FollowerResponseDto> {
+        const observableOptions = wrapOptions(_options);
+        const result = this.api.followerControllerIsFriend(followerPayloadDto, observableOptions);
+        return result.toPromise();
+    }
+
+    /**
+     * @param followerPayloadDto
+     */
     public followerControllerUnfollowWithHttpInfo(followerPayloadDto: FollowerPayloadDto, _options?: PromiseConfigurationOptions): Promise<HttpInfo<FollowerResponseDto>> {
         const observableOptions = wrapOptions(_options);
         const result = this.api.followerControllerUnfollowWithHttpInfo(followerPayloadDto, observableOptions);

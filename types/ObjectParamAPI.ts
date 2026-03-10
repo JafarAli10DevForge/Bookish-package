@@ -2410,6 +2410,15 @@ export interface FollowerApiFollowerControllerFollowRequest {
 export interface FollowerApiFollowerControllerFriendRequestListRequest {
 }
 
+export interface FollowerApiFollowerControllerIsFriendRequest {
+    /**
+     * 
+     * @type FollowerPayloadDto
+     * @memberof FollowerApifollowerControllerIsFriend
+     */
+    followerPayloadDto: FollowerPayloadDto
+}
+
 export interface FollowerApiFollowerControllerUnfollowRequest {
     /**
      * 
@@ -2480,6 +2489,20 @@ export class ObjectFollowerApi {
      */
     public followerControllerFriendRequestList(param: FollowerApiFollowerControllerFriendRequestListRequest = {}, options?: ConfigurationOptions): Promise<FriendRequestItemEntityDto> {
         return this.api.followerControllerFriendRequestList( options).toPromise();
+    }
+
+    /**
+     * @param param the request object
+     */
+    public followerControllerIsFriendWithHttpInfo(param: FollowerApiFollowerControllerIsFriendRequest, options?: ConfigurationOptions): Promise<HttpInfo<FollowerResponseDto>> {
+        return this.api.followerControllerIsFriendWithHttpInfo(param.followerPayloadDto,  options).toPromise();
+    }
+
+    /**
+     * @param param the request object
+     */
+    public followerControllerIsFriend(param: FollowerApiFollowerControllerIsFriendRequest, options?: ConfigurationOptions): Promise<FollowerResponseDto> {
+        return this.api.followerControllerIsFriend(param.followerPayloadDto,  options).toPromise();
     }
 
     /**

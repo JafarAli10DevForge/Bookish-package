@@ -281,6 +281,7 @@ const request: AuthApiAuthControllerCreateBusinessUserRequest = {
     password: "password_example",
     role: "role_example",
     currency: "currency_example",
+    activityStatus: "public",
   },
 };
 
@@ -510,6 +511,7 @@ const request: AuthApiAuthControllerCreateUserRequest = {
     password: "password_example",
     role: "role_example",
     currency: "currency_example",
+    activityStatus: "public",
   },
 };
 

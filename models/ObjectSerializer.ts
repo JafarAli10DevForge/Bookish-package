@@ -231,7 +231,7 @@ import { ReadingGoalResponse } from '../models/ReadingGoalResponse';
 import { ReadingGoalResponseDTO } from '../models/ReadingGoalResponseDTO';
 import { Review } from '../models/Review';
 import { RoleResponseDto } from '../models/RoleResponseDto';
-import { SignupPayloadDto } from '../models/SignupPayloadDto';
+import { SignupPayloadDto     , SignupPayloadDtoActivityStatusEnum   } from '../models/SignupPayloadDto';
 import { StorageResponseDto } from '../models/StorageResponseDto';
 import { StoreDetailsPayloadDto } from '../models/StoreDetailsPayloadDto';
 import { StripePayloadDto } from '../models/StripePayloadDto';
@@ -280,6 +280,7 @@ let primitives = [
 
 let enumsMap: Set<string> = new Set<string>([
     "BusinessConnectedAccountStatusEnum",
+    "SignupPayloadDtoActivityStatusEnum",
 ]);
 
 let typeMap: {[index: string]: any} = {

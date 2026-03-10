@@ -8,6 +8,7 @@ Method | HTTP request | Description
 [**followerControllerFindMyFriends**](FollowerApi.md#followerControllerFindMyFriends) | **POST** /v1/all/friends | 
 [**followerControllerFollow**](FollowerApi.md#followerControllerFollow) | **POST** /v1/relationship/follow | 
 [**followerControllerFriendRequestList**](FollowerApi.md#followerControllerFriendRequestList) | **GET** /v1/relationship/friend-request-list | 
+[**followerControllerIsFriend**](FollowerApi.md#followerControllerIsFriend) | **POST** /v1/relationship/isFriend | 
 [**followerControllerUnfollow**](FollowerApi.md#followerControllerUnfollow) | **POST** /v1/relationship/unfollow | 
 
 
@@ -214,6 +215,61 @@ This endpoint does not need any parameter.
 ### HTTP request headers
 
  - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** |  |  -  |
+**401** | Unauthorized |  -  |
+
+[[Back to top]](#) [[Back to API list]](README.md#documentation-for-api-endpoints) [[Back to Model list]](README.md#documentation-for-models) [[Back to README]](README.md)
+
+# **followerControllerIsFriend**
+> FollowerResponseDto followerControllerIsFriend(followerPayloadDto)
+
+
+### Example
+
+
+```typescript
+import { createConfiguration, FollowerApi } from '';
+import type { FollowerApiFollowerControllerIsFriendRequest } from '';
+
+const configuration = createConfiguration();
+const apiInstance = new FollowerApi(configuration);
+
+const request: FollowerApiFollowerControllerIsFriendRequest = {
+  
+  followerPayloadDto: {
+    follower: "follower_example",
+  },
+};
+
+const data = await apiInstance.followerControllerIsFriend(request);
+console.log('API called successfully. Returned data:', data);
+```
+
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **followerPayloadDto** | **FollowerPayloadDto**|  |
+
+
+### Return type
+
+**FollowerResponseDto**
+
+### Authorization
+
+[bearer](README.md#bearer)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
  - **Accept**: application/json
 
 
