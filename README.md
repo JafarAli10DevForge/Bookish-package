@@ -78,4 +78,3 @@ p.status = "available";
 Promise<your_api.Pet> createdPet = api.addPet(p);
 
 ```
-# Bookish-package
