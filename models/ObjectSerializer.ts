@@ -435,7 +435,7 @@ type MimeTypeDescriptor = {
  * the payload.
  */
 const parseMimeType = (mimeType: string): MimeTypeDescriptor => {
-    const [type = '', subtype = ''] = mimeType.split('/');
+    const [type, subtype] = mimeType.split('/');
     return {
         type,
         subtype,
@@ -471,13 +471,6 @@ const supportedMimeTypePredicatesWithPriority: MimeTypePredicate[] = [
     isFormUrlencodedMimeType,
 ];
 
-const nullableSuffix = " | null";
-const optionalSuffix = " | undefined";
-const arrayPrefix = "Array<";
-const arraySuffix = ">";
-const mapPrefix = "{ [key: string]: ";
-const mapSuffix = "; }";
-
 export class ObjectSerializer {
     public static findCorrectType(data: any, expectedType: string) {
         if (data == undefined) {
@@ -502,11 +495,8 @@ export class ObjectSerializer {
             } else {
                 if (data[discriminatorProperty]) {
                     var discriminatorType = data[discriminatorProperty];
-                    let mapping = typeMap[expectedType].mapping;
-                    if (mapping != undefined && mapping[discriminatorType]) {
-                        return mapping[discriminatorType]; // use the type given in the discriminator
-                    } else if(typeMap[discriminatorType]) {
-                        return discriminatorType;
+                    if(typeMap[discriminatorType]){
+                        return discriminatorType; // use the type given in the discriminator
                     } else {
                         return expectedType; // discriminator did not map to a type
                     }
@@ -517,46 +507,27 @@ export class ObjectSerializer {
         }
     }
 
-    public static serialize(data: any, type: string, format: string): any {
+    public static serialize(data: any, type: string, format: string) {
         if (data == undefined) {
             return data;
         } else if (primitives.indexOf(type.toLowerCase()) !== -1) {
             return data;
-        } else if (type.endsWith(nullableSuffix)) {
-            let subType: string = type.slice(0, -nullableSuffix.length); // Type | null => Type
-            return ObjectSerializer.serialize(data, subType, format);
-        } else if (type.endsWith(optionalSuffix)) {
-            let subType: string = type.slice(0, -optionalSuffix.length); // Type | undefined => Type
-            return ObjectSerializer.serialize(data, subType, format);
-        } else if (type.startsWith(arrayPrefix)) {
-            let subType: string = type.slice(arrayPrefix.length, -arraySuffix.length); // Array<Type> => Type
+        } else if (type.lastIndexOf("Array<", 0) === 0) { // string.startsWith pre es6
+            let subType: string = type.replace("Array<", ""); // Array<Type> => Type>
+            subType = subType.substring(0, subType.length - 1); // Type> => Type
             let transformedData: any[] = [];
             for (let date of data) {
                 transformedData.push(ObjectSerializer.serialize(date, subType, format));
             }
             return transformedData;
-        } else if (type.startsWith(mapPrefix)) {
-            let subType: string = type.slice(mapPrefix.length, -mapSuffix.length); // { [key: string]: Type; } => Type
-            let transformedData: { [key: string]: any } = {};
-            for (let key in data) {
-                transformedData[key] = ObjectSerializer.serialize(
-                    data[key],
-                    subType,
-                    format,
-                );
-            }
-            return transformedData;
         } else if (type === "Date") {
-            if (!(data instanceof Date)) {
-                return data;
-            }
             if (format == "date") {
                 let month = data.getMonth()+1
-                let monthStr = month < 10 ? "0" + month.toString() : month.toString()
+                month = month < 10 ? "0" + month.toString() : month.toString()
                 let day = data.getDate();
-                let dayStr = day < 10 ? "0" + day.toString() : day.toString();
+                day = day < 10 ? "0" + day.toString() : day.toString();
 
-                return data.getFullYear() + "-" + monthStr + "-" + dayStr;
+                return data.getFullYear() + "-" + month + "-" + day;
             } else {
                 return data.toISOString();
             }
@@ -581,35 +552,19 @@ export class ObjectSerializer {
         }
     }
 
-    public static deserialize(data: any, type: string, format: string): any {
+    public static deserialize(data: any, type: string, format: string) {
         // polymorphism may change the actual type.
         type = ObjectSerializer.findCorrectType(data, type);
         if (data == undefined) {
             return data;
         } else if (primitives.indexOf(type.toLowerCase()) !== -1) {
             return data;
-        } else if (type.endsWith(nullableSuffix)) {
-            let subType: string = type.slice(0, -nullableSuffix.length); // Type | null => Type
-            return ObjectSerializer.deserialize(data, subType, format);
-        } else if (type.endsWith(optionalSuffix)) {
-            let subType: string = type.slice(0, -optionalSuffix.length); // Type | undefined => Type
-            return ObjectSerializer.deserialize(data, subType, format);
-        } else if (type.startsWith(arrayPrefix)) {
-            let subType: string = type.slice(arrayPrefix.length, -arraySuffix.length); // Array<Type> => Type
+        } else if (type.lastIndexOf("Array<", 0) === 0) { // string.startsWith pre es6
+            let subType: string = type.replace("Array<", ""); // Array<Type> => Type>
+            subType = subType.substring(0, subType.length - 1); // Type> => Type
             let transformedData: any[] = [];
             for (let date of data) {
                 transformedData.push(ObjectSerializer.deserialize(date, subType, format));
-            }
-            return transformedData;
-        } else if (type.startsWith(mapPrefix)) {
-            let subType: string = type.slice(mapPrefix.length, -mapSuffix.length); // { [key: string]: Type; } => Type
-            let transformedData: { [key: string]: any } = {};
-            for (let key in data) {
-                transformedData[key] = ObjectSerializer.deserialize(
-                    data[key],
-                    subType,
-                    format,
-                );
             }
             return transformedData;
         } else if (type === "Date") {
@@ -645,7 +600,7 @@ export class ObjectSerializer {
         if (mediaType === undefined) {
             return undefined;
         }
-        return (mediaType.split(";")[0] ?? '').trim().toLowerCase();
+        return mediaType.split(";")[0].trim().toLowerCase();
     }
 
     /**
@@ -660,7 +615,7 @@ export class ObjectSerializer {
             return "application/json";
         }
 
-        const normalMediaTypes = mediaTypes.map(ObjectSerializer.normalizeMediaType);
+        const normalMediaTypes = mediaTypes.map(this.normalizeMediaType);
 
         for (const predicate of supportedMimeTypePredicatesWithPriority) {
             for (const mediaType of normalMediaTypes) {

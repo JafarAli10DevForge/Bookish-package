@@ -17,8 +17,6 @@ export class FileUrl {
 
     static readonly discriminator: string | undefined = undefined;
 
-    static readonly mapping: {[index: string]: string} | undefined = undefined;
-
     static readonly attributeTypeMap: Array<{name: string, baseName: string, type: string, format: string}> = [
         {
             "name": "file",
@@ -34,3 +32,4 @@ export class FileUrl {
     public constructor() {
     }
 }
+

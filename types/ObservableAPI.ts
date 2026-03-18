@@ -1,6 +1,5 @@
 import { ResponseContext, RequestContext, HttpFile, HttpInfo } from '../http/http';
-import { Configuration, ConfigurationOptions, mergeConfiguration } from '../configuration'
-import type { Middleware } from '../middleware';
+import { Configuration} from '../configuration'
 import { Observable, of, from } from '../rxjsStub';
 import {mergeMap, map} from  '../rxjsStub';
 import { AcceptFollowerPayloadDto } from '../models/AcceptFollowerPayloadDto';
@@ -154,22 +153,21 @@ export class ObservableAnalyticsApi {
     }
 
     /**
-     * @param userId
+     * @param userId 
      */
-    public analyticsControllerGetAnalyticsWithHttpInfo(userId: string, _options?: ConfigurationOptions): Observable<HttpInfo<AnalyticsResponseDTO>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public analyticsControllerGetAnalyticsWithHttpInfo(userId: string, _options?: Configuration): Observable<HttpInfo<AnalyticsResponseDTO>> {
+        const requestContextPromise = this.requestFactory.analyticsControllerGetAnalytics(userId, _options);
 
-        const requestContextPromise = this.requestFactory.analyticsControllerGetAnalytics(userId, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.analyticsControllerGetAnalyticsWithHttpInfo(rsp)));
@@ -177,9 +175,9 @@ export class ObservableAnalyticsApi {
     }
 
     /**
-     * @param userId
+     * @param userId 
      */
-    public analyticsControllerGetAnalytics(userId: string, _options?: ConfigurationOptions): Observable<AnalyticsResponseDTO> {
+    public analyticsControllerGetAnalytics(userId: string, _options?: Configuration): Observable<AnalyticsResponseDTO> {
         return this.analyticsControllerGetAnalyticsWithHttpInfo(userId, _options).pipe(map((apiResponse: HttpInfo<AnalyticsResponseDTO>) => apiResponse.data));
     }
 
@@ -203,20 +201,19 @@ export class ObservableAuthApi {
 
     /**
      */
-    public authControllerAccountDeletionWithHttpInfo(_options?: ConfigurationOptions): Observable<HttpInfo<UserDeleteResponseDto>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public authControllerAccountDeletionWithHttpInfo(_options?: Configuration): Observable<HttpInfo<UserDeleteResponseDto>> {
+        const requestContextPromise = this.requestFactory.authControllerAccountDeletion(_options);
 
-        const requestContextPromise = this.requestFactory.authControllerAccountDeletion(_config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.authControllerAccountDeletionWithHttpInfo(rsp)));
@@ -225,27 +222,26 @@ export class ObservableAuthApi {
 
     /**
      */
-    public authControllerAccountDeletion(_options?: ConfigurationOptions): Observable<UserDeleteResponseDto> {
+    public authControllerAccountDeletion(_options?: Configuration): Observable<UserDeleteResponseDto> {
         return this.authControllerAccountDeletionWithHttpInfo(_options).pipe(map((apiResponse: HttpInfo<UserDeleteResponseDto>) => apiResponse.data));
     }
 
     /**
-     * @param feedbackPayloadDto
+     * @param feedbackPayloadDto 
      */
-    public authControllerAddFeedbackWithHttpInfo(feedbackPayloadDto: FeedbackPayloadDto, _options?: ConfigurationOptions): Observable<HttpInfo<FeedbackCreateResponseDto>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public authControllerAddFeedbackWithHttpInfo(feedbackPayloadDto: FeedbackPayloadDto, _options?: Configuration): Observable<HttpInfo<FeedbackCreateResponseDto>> {
+        const requestContextPromise = this.requestFactory.authControllerAddFeedback(feedbackPayloadDto, _options);
 
-        const requestContextPromise = this.requestFactory.authControllerAddFeedback(feedbackPayloadDto, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.authControllerAddFeedbackWithHttpInfo(rsp)));
@@ -253,29 +249,28 @@ export class ObservableAuthApi {
     }
 
     /**
-     * @param feedbackPayloadDto
+     * @param feedbackPayloadDto 
      */
-    public authControllerAddFeedback(feedbackPayloadDto: FeedbackPayloadDto, _options?: ConfigurationOptions): Observable<FeedbackCreateResponseDto> {
+    public authControllerAddFeedback(feedbackPayloadDto: FeedbackPayloadDto, _options?: Configuration): Observable<FeedbackCreateResponseDto> {
         return this.authControllerAddFeedbackWithHttpInfo(feedbackPayloadDto, _options).pipe(map((apiResponse: HttpInfo<FeedbackCreateResponseDto>) => apiResponse.data));
     }
 
     /**
-     * @param appfeepercentageUpdatePayloadDto
+     * @param appfeepercentageUpdatePayloadDto 
      */
-    public authControllerAppfeepercentageUpdateWithHttpInfo(appfeepercentageUpdatePayloadDto: AppfeepercentageUpdatePayloadDto, _options?: ConfigurationOptions): Observable<HttpInfo<AppfeepercentageResponseDto>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public authControllerAppfeepercentageUpdateWithHttpInfo(appfeepercentageUpdatePayloadDto: AppfeepercentageUpdatePayloadDto, _options?: Configuration): Observable<HttpInfo<AppfeepercentageResponseDto>> {
+        const requestContextPromise = this.requestFactory.authControllerAppfeepercentageUpdate(appfeepercentageUpdatePayloadDto, _options);
 
-        const requestContextPromise = this.requestFactory.authControllerAppfeepercentageUpdate(appfeepercentageUpdatePayloadDto, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.authControllerAppfeepercentageUpdateWithHttpInfo(rsp)));
@@ -283,29 +278,28 @@ export class ObservableAuthApi {
     }
 
     /**
-     * @param appfeepercentageUpdatePayloadDto
+     * @param appfeepercentageUpdatePayloadDto 
      */
-    public authControllerAppfeepercentageUpdate(appfeepercentageUpdatePayloadDto: AppfeepercentageUpdatePayloadDto, _options?: ConfigurationOptions): Observable<AppfeepercentageResponseDto> {
+    public authControllerAppfeepercentageUpdate(appfeepercentageUpdatePayloadDto: AppfeepercentageUpdatePayloadDto, _options?: Configuration): Observable<AppfeepercentageResponseDto> {
         return this.authControllerAppfeepercentageUpdateWithHttpInfo(appfeepercentageUpdatePayloadDto, _options).pipe(map((apiResponse: HttpInfo<AppfeepercentageResponseDto>) => apiResponse.data));
     }
 
     /**
-     * @param changePayloadDto
+     * @param changePayloadDto 
      */
-    public authControllerChangePasswordWithHttpInfo(changePayloadDto: ChangePayloadDto, _options?: ConfigurationOptions): Observable<HttpInfo<PasswordChangeResponseDto>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public authControllerChangePasswordWithHttpInfo(changePayloadDto: ChangePayloadDto, _options?: Configuration): Observable<HttpInfo<PasswordChangeResponseDto>> {
+        const requestContextPromise = this.requestFactory.authControllerChangePassword(changePayloadDto, _options);
 
-        const requestContextPromise = this.requestFactory.authControllerChangePassword(changePayloadDto, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.authControllerChangePasswordWithHttpInfo(rsp)));
@@ -313,29 +307,28 @@ export class ObservableAuthApi {
     }
 
     /**
-     * @param changePayloadDto
+     * @param changePayloadDto 
      */
-    public authControllerChangePassword(changePayloadDto: ChangePayloadDto, _options?: ConfigurationOptions): Observable<PasswordChangeResponseDto> {
+    public authControllerChangePassword(changePayloadDto: ChangePayloadDto, _options?: Configuration): Observable<PasswordChangeResponseDto> {
         return this.authControllerChangePasswordWithHttpInfo(changePayloadDto, _options).pipe(map((apiResponse: HttpInfo<PasswordChangeResponseDto>) => apiResponse.data));
     }
 
     /**
-     * @param signupPayloadDto
+     * @param signupPayloadDto 
      */
-    public authControllerCreateBusinessUserWithHttpInfo(signupPayloadDto: SignupPayloadDto, _options?: ConfigurationOptions): Observable<HttpInfo<UserResponseDto>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public authControllerCreateBusinessUserWithHttpInfo(signupPayloadDto: SignupPayloadDto, _options?: Configuration): Observable<HttpInfo<UserResponseDto>> {
+        const requestContextPromise = this.requestFactory.authControllerCreateBusinessUser(signupPayloadDto, _options);
 
-        const requestContextPromise = this.requestFactory.authControllerCreateBusinessUser(signupPayloadDto, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.authControllerCreateBusinessUserWithHttpInfo(rsp)));
@@ -343,29 +336,28 @@ export class ObservableAuthApi {
     }
 
     /**
-     * @param signupPayloadDto
+     * @param signupPayloadDto 
      */
-    public authControllerCreateBusinessUser(signupPayloadDto: SignupPayloadDto, _options?: ConfigurationOptions): Observable<UserResponseDto> {
+    public authControllerCreateBusinessUser(signupPayloadDto: SignupPayloadDto, _options?: Configuration): Observable<UserResponseDto> {
         return this.authControllerCreateBusinessUserWithHttpInfo(signupPayloadDto, _options).pipe(map((apiResponse: HttpInfo<UserResponseDto>) => apiResponse.data));
     }
 
     /**
      * @param createRoleDto Payload to create a new role
      */
-    public authControllerCreateRolesWithHttpInfo(createRoleDto: CreateRoleDto, _options?: ConfigurationOptions): Observable<HttpInfo<void>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public authControllerCreateRolesWithHttpInfo(createRoleDto: CreateRoleDto, _options?: Configuration): Observable<HttpInfo<void>> {
+        const requestContextPromise = this.requestFactory.authControllerCreateRoles(createRoleDto, _options);
 
-        const requestContextPromise = this.requestFactory.authControllerCreateRoles(createRoleDto, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.authControllerCreateRolesWithHttpInfo(rsp)));
@@ -375,27 +367,26 @@ export class ObservableAuthApi {
     /**
      * @param createRoleDto Payload to create a new role
      */
-    public authControllerCreateRoles(createRoleDto: CreateRoleDto, _options?: ConfigurationOptions): Observable<void> {
+    public authControllerCreateRoles(createRoleDto: CreateRoleDto, _options?: Configuration): Observable<void> {
         return this.authControllerCreateRolesWithHttpInfo(createRoleDto, _options).pipe(map((apiResponse: HttpInfo<void>) => apiResponse.data));
     }
 
     /**
-     * @param createStaffDto
+     * @param createStaffDto 
      */
-    public authControllerCreateStaffWithHttpInfo(createStaffDto: CreateStaffDto, _options?: ConfigurationOptions): Observable<HttpInfo<CreateStaffDto>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public authControllerCreateStaffWithHttpInfo(createStaffDto: CreateStaffDto, _options?: Configuration): Observable<HttpInfo<CreateStaffDto>> {
+        const requestContextPromise = this.requestFactory.authControllerCreateStaff(createStaffDto, _options);
 
-        const requestContextPromise = this.requestFactory.authControllerCreateStaff(createStaffDto, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.authControllerCreateStaffWithHttpInfo(rsp)));
@@ -403,29 +394,28 @@ export class ObservableAuthApi {
     }
 
     /**
-     * @param createStaffDto
+     * @param createStaffDto 
      */
-    public authControllerCreateStaff(createStaffDto: CreateStaffDto, _options?: ConfigurationOptions): Observable<CreateStaffDto> {
+    public authControllerCreateStaff(createStaffDto: CreateStaffDto, _options?: Configuration): Observable<CreateStaffDto> {
         return this.authControllerCreateStaffWithHttpInfo(createStaffDto, _options).pipe(map((apiResponse: HttpInfo<CreateStaffDto>) => apiResponse.data));
     }
 
     /**
      * @param createStaffRoleDto Payload to create a new role
      */
-    public authControllerCreateStaffRoleWithHttpInfo(createStaffRoleDto: CreateStaffRoleDto, _options?: ConfigurationOptions): Observable<HttpInfo<void>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public authControllerCreateStaffRoleWithHttpInfo(createStaffRoleDto: CreateStaffRoleDto, _options?: Configuration): Observable<HttpInfo<void>> {
+        const requestContextPromise = this.requestFactory.authControllerCreateStaffRole(createStaffRoleDto, _options);
 
-        const requestContextPromise = this.requestFactory.authControllerCreateStaffRole(createStaffRoleDto, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.authControllerCreateStaffRoleWithHttpInfo(rsp)));
@@ -435,27 +425,26 @@ export class ObservableAuthApi {
     /**
      * @param createStaffRoleDto Payload to create a new role
      */
-    public authControllerCreateStaffRole(createStaffRoleDto: CreateStaffRoleDto, _options?: ConfigurationOptions): Observable<void> {
+    public authControllerCreateStaffRole(createStaffRoleDto: CreateStaffRoleDto, _options?: Configuration): Observable<void> {
         return this.authControllerCreateStaffRoleWithHttpInfo(createStaffRoleDto, _options).pipe(map((apiResponse: HttpInfo<void>) => apiResponse.data));
     }
 
     /**
-     * @param signupPayloadDto
+     * @param signupPayloadDto 
      */
-    public authControllerCreateUserWithHttpInfo(signupPayloadDto: SignupPayloadDto, _options?: ConfigurationOptions): Observable<HttpInfo<UserResponseDto>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public authControllerCreateUserWithHttpInfo(signupPayloadDto: SignupPayloadDto, _options?: Configuration): Observable<HttpInfo<UserResponseDto>> {
+        const requestContextPromise = this.requestFactory.authControllerCreateUser(signupPayloadDto, _options);
 
-        const requestContextPromise = this.requestFactory.authControllerCreateUser(signupPayloadDto, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.authControllerCreateUserWithHttpInfo(rsp)));
@@ -463,29 +452,28 @@ export class ObservableAuthApi {
     }
 
     /**
-     * @param signupPayloadDto
+     * @param signupPayloadDto 
      */
-    public authControllerCreateUser(signupPayloadDto: SignupPayloadDto, _options?: ConfigurationOptions): Observable<UserResponseDto> {
+    public authControllerCreateUser(signupPayloadDto: SignupPayloadDto, _options?: Configuration): Observable<UserResponseDto> {
         return this.authControllerCreateUserWithHttpInfo(signupPayloadDto, _options).pipe(map((apiResponse: HttpInfo<UserResponseDto>) => apiResponse.data));
     }
 
     /**
-     * @param id
+     * @param id 
      */
-    public authControllerDeleteRoleWithHttpInfo(id: string, _options?: ConfigurationOptions): Observable<HttpInfo<void>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public authControllerDeleteRoleWithHttpInfo(id: string, _options?: Configuration): Observable<HttpInfo<void>> {
+        const requestContextPromise = this.requestFactory.authControllerDeleteRole(id, _options);
 
-        const requestContextPromise = this.requestFactory.authControllerDeleteRole(id, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.authControllerDeleteRoleWithHttpInfo(rsp)));
@@ -493,29 +481,28 @@ export class ObservableAuthApi {
     }
 
     /**
-     * @param id
+     * @param id 
      */
-    public authControllerDeleteRole(id: string, _options?: ConfigurationOptions): Observable<void> {
+    public authControllerDeleteRole(id: string, _options?: Configuration): Observable<void> {
         return this.authControllerDeleteRoleWithHttpInfo(id, _options).pipe(map((apiResponse: HttpInfo<void>) => apiResponse.data));
     }
 
     /**
-     * @param id
+     * @param id 
      */
-    public authControllerDeleteStaffWithHttpInfo(id: string, _options?: ConfigurationOptions): Observable<HttpInfo<UserDeleteResponseDto>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public authControllerDeleteStaffWithHttpInfo(id: string, _options?: Configuration): Observable<HttpInfo<UserDeleteResponseDto>> {
+        const requestContextPromise = this.requestFactory.authControllerDeleteStaff(id, _options);
 
-        const requestContextPromise = this.requestFactory.authControllerDeleteStaff(id, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.authControllerDeleteStaffWithHttpInfo(rsp)));
@@ -523,29 +510,28 @@ export class ObservableAuthApi {
     }
 
     /**
-     * @param id
+     * @param id 
      */
-    public authControllerDeleteStaff(id: string, _options?: ConfigurationOptions): Observable<UserDeleteResponseDto> {
+    public authControllerDeleteStaff(id: string, _options?: Configuration): Observable<UserDeleteResponseDto> {
         return this.authControllerDeleteStaffWithHttpInfo(id, _options).pipe(map((apiResponse: HttpInfo<UserDeleteResponseDto>) => apiResponse.data));
     }
 
     /**
-     * @param id
+     * @param id 
      */
-    public authControllerDeleteStaffRoleWithHttpInfo(id: string, _options?: ConfigurationOptions): Observable<HttpInfo<void>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public authControllerDeleteStaffRoleWithHttpInfo(id: string, _options?: Configuration): Observable<HttpInfo<void>> {
+        const requestContextPromise = this.requestFactory.authControllerDeleteStaffRole(id, _options);
 
-        const requestContextPromise = this.requestFactory.authControllerDeleteStaffRole(id, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.authControllerDeleteStaffRoleWithHttpInfo(rsp)));
@@ -553,29 +539,28 @@ export class ObservableAuthApi {
     }
 
     /**
-     * @param id
+     * @param id 
      */
-    public authControllerDeleteStaffRole(id: string, _options?: ConfigurationOptions): Observable<void> {
+    public authControllerDeleteStaffRole(id: string, _options?: Configuration): Observable<void> {
         return this.authControllerDeleteStaffRoleWithHttpInfo(id, _options).pipe(map((apiResponse: HttpInfo<void>) => apiResponse.data));
     }
 
     /**
-     * @param forgetPasswordPayloadDto
+     * @param forgetPasswordPayloadDto 
      */
-    public authControllerForgetPasswordWithHttpInfo(forgetPasswordPayloadDto: ForgetPasswordPayloadDto, _options?: ConfigurationOptions): Observable<HttpInfo<ForgetPasswordEntityResponseDto>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public authControllerForgetPasswordWithHttpInfo(forgetPasswordPayloadDto: ForgetPasswordPayloadDto, _options?: Configuration): Observable<HttpInfo<ForgetPasswordEntityResponseDto>> {
+        const requestContextPromise = this.requestFactory.authControllerForgetPassword(forgetPasswordPayloadDto, _options);
 
-        const requestContextPromise = this.requestFactory.authControllerForgetPassword(forgetPasswordPayloadDto, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.authControllerForgetPasswordWithHttpInfo(rsp)));
@@ -583,29 +568,28 @@ export class ObservableAuthApi {
     }
 
     /**
-     * @param forgetPasswordPayloadDto
+     * @param forgetPasswordPayloadDto 
      */
-    public authControllerForgetPassword(forgetPasswordPayloadDto: ForgetPasswordPayloadDto, _options?: ConfigurationOptions): Observable<ForgetPasswordEntityResponseDto> {
+    public authControllerForgetPassword(forgetPasswordPayloadDto: ForgetPasswordPayloadDto, _options?: Configuration): Observable<ForgetPasswordEntityResponseDto> {
         return this.authControllerForgetPasswordWithHttpInfo(forgetPasswordPayloadDto, _options).pipe(map((apiResponse: HttpInfo<ForgetPasswordEntityResponseDto>) => apiResponse.data));
     }
 
     /**
-     * @param user
+     * @param user 
      */
-    public authControllerGetAchievementWithHttpInfo(user: string, _options?: ConfigurationOptions): Observable<HttpInfo<UserAchievementResponseDTO>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public authControllerGetAchievementWithHttpInfo(user: string, _options?: Configuration): Observable<HttpInfo<UserAchievementResponseDTO>> {
+        const requestContextPromise = this.requestFactory.authControllerGetAchievement(user, _options);
 
-        const requestContextPromise = this.requestFactory.authControllerGetAchievement(user, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.authControllerGetAchievementWithHttpInfo(rsp)));
@@ -613,34 +597,33 @@ export class ObservableAuthApi {
     }
 
     /**
-     * @param user
+     * @param user 
      */
-    public authControllerGetAchievement(user: string, _options?: ConfigurationOptions): Observable<UserAchievementResponseDTO> {
+    public authControllerGetAchievement(user: string, _options?: Configuration): Observable<UserAchievementResponseDTO> {
         return this.authControllerGetAchievementWithHttpInfo(user, _options).pipe(map((apiResponse: HttpInfo<UserAchievementResponseDTO>) => apiResponse.data));
     }
 
     /**
-     * @param page
-     * @param limit
-     * @param [longitude]
-     * @param [latitude]
-     * @param [global]
-     * @param [search]
+     * @param page 
+     * @param limit 
+     * @param longitude 
+     * @param latitude 
+     * @param global 
+     * @param search 
      */
-    public authControllerGetActivityWithHttpInfo(page: number, limit: number, longitude?: number, latitude?: number, global?: boolean, search?: string, _options?: ConfigurationOptions): Observable<HttpInfo<ActivityResponseDto>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public authControllerGetActivityWithHttpInfo(page: number, limit: number, longitude?: number, latitude?: number, global?: boolean, search?: string, _options?: Configuration): Observable<HttpInfo<ActivityResponseDto>> {
+        const requestContextPromise = this.requestFactory.authControllerGetActivity(page, limit, longitude, latitude, global, search, _options);
 
-        const requestContextPromise = this.requestFactory.authControllerGetActivity(page, limit, longitude, latitude, global, search, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.authControllerGetActivityWithHttpInfo(rsp)));
@@ -648,37 +631,36 @@ export class ObservableAuthApi {
     }
 
     /**
-     * @param page
-     * @param limit
-     * @param [longitude]
-     * @param [latitude]
-     * @param [global]
-     * @param [search]
+     * @param page 
+     * @param limit 
+     * @param longitude 
+     * @param latitude 
+     * @param global 
+     * @param search 
      */
-    public authControllerGetActivity(page: number, limit: number, longitude?: number, latitude?: number, global?: boolean, search?: string, _options?: ConfigurationOptions): Observable<ActivityResponseDto> {
+    public authControllerGetActivity(page: number, limit: number, longitude?: number, latitude?: number, global?: boolean, search?: string, _options?: Configuration): Observable<ActivityResponseDto> {
         return this.authControllerGetActivityWithHttpInfo(page, limit, longitude, latitude, global, search, _options).pipe(map((apiResponse: HttpInfo<ActivityResponseDto>) => apiResponse.data));
     }
 
     /**
-     * @param page
-     * @param ownerId
-     * @param limit
-     * @param [search]
+     * @param page 
+     * @param ownerId 
+     * @param limit 
+     * @param search 
      */
-    public authControllerGetAllStaffWithHttpInfo(page: number, ownerId: string, limit: number, search?: string, _options?: ConfigurationOptions): Observable<HttpInfo<void>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public authControllerGetAllStaffWithHttpInfo(page: number, ownerId: string, limit: number, search?: string, _options?: Configuration): Observable<HttpInfo<void>> {
+        const requestContextPromise = this.requestFactory.authControllerGetAllStaff(page, ownerId, limit, search, _options);
 
-        const requestContextPromise = this.requestFactory.authControllerGetAllStaff(page, ownerId, limit, search, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.authControllerGetAllStaffWithHttpInfo(rsp)));
@@ -686,33 +668,32 @@ export class ObservableAuthApi {
     }
 
     /**
-     * @param page
-     * @param ownerId
-     * @param limit
-     * @param [search]
+     * @param page 
+     * @param ownerId 
+     * @param limit 
+     * @param search 
      */
-    public authControllerGetAllStaff(page: number, ownerId: string, limit: number, search?: string, _options?: ConfigurationOptions): Observable<void> {
+    public authControllerGetAllStaff(page: number, ownerId: string, limit: number, search?: string, _options?: Configuration): Observable<void> {
         return this.authControllerGetAllStaffWithHttpInfo(page, ownerId, limit, search, _options).pipe(map((apiResponse: HttpInfo<void>) => apiResponse.data));
     }
 
     /**
-     * @param page
-     * @param limit
+     * @param page 
+     * @param limit 
      */
-    public authControllerGetAllusersWithHttpInfo(page: number, limit: number, _options?: ConfigurationOptions): Observable<HttpInfo<void>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public authControllerGetAllusersWithHttpInfo(page: number, limit: number, _options?: Configuration): Observable<HttpInfo<void>> {
+        const requestContextPromise = this.requestFactory.authControllerGetAllusers(page, limit, _options);
 
-        const requestContextPromise = this.requestFactory.authControllerGetAllusers(page, limit, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.authControllerGetAllusersWithHttpInfo(rsp)));
@@ -720,35 +701,34 @@ export class ObservableAuthApi {
     }
 
     /**
-     * @param page
-     * @param limit
+     * @param page 
+     * @param limit 
      */
-    public authControllerGetAllusers(page: number, limit: number, _options?: ConfigurationOptions): Observable<void> {
+    public authControllerGetAllusers(page: number, limit: number, _options?: Configuration): Observable<void> {
         return this.authControllerGetAllusersWithHttpInfo(page, limit, _options).pipe(map((apiResponse: HttpInfo<void>) => apiResponse.data));
     }
 
     /**
-     * @param page
-     * @param limit
-     * @param [longitude]
-     * @param [latitude]
-     * @param [global]
-     * @param [search]
+     * @param page 
+     * @param limit 
+     * @param longitude 
+     * @param latitude 
+     * @param global 
+     * @param search 
      */
-    public authControllerGetEventsActivityWithHttpInfo(page: number, limit: number, longitude?: number, latitude?: number, global?: boolean, search?: string, _options?: ConfigurationOptions): Observable<HttpInfo<ActivityResponseDto>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public authControllerGetEventsActivityWithHttpInfo(page: number, limit: number, longitude?: number, latitude?: number, global?: boolean, search?: string, _options?: Configuration): Observable<HttpInfo<ActivityResponseDto>> {
+        const requestContextPromise = this.requestFactory.authControllerGetEventsActivity(page, limit, longitude, latitude, global, search, _options);
 
-        const requestContextPromise = this.requestFactory.authControllerGetEventsActivity(page, limit, longitude, latitude, global, search, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.authControllerGetEventsActivityWithHttpInfo(rsp)));
@@ -756,38 +736,37 @@ export class ObservableAuthApi {
     }
 
     /**
-     * @param page
-     * @param limit
-     * @param [longitude]
-     * @param [latitude]
-     * @param [global]
-     * @param [search]
+     * @param page 
+     * @param limit 
+     * @param longitude 
+     * @param latitude 
+     * @param global 
+     * @param search 
      */
-    public authControllerGetEventsActivity(page: number, limit: number, longitude?: number, latitude?: number, global?: boolean, search?: string, _options?: ConfigurationOptions): Observable<ActivityResponseDto> {
+    public authControllerGetEventsActivity(page: number, limit: number, longitude?: number, latitude?: number, global?: boolean, search?: string, _options?: Configuration): Observable<ActivityResponseDto> {
         return this.authControllerGetEventsActivityWithHttpInfo(page, limit, longitude, latitude, global, search, _options).pipe(map((apiResponse: HttpInfo<ActivityResponseDto>) => apiResponse.data));
     }
 
     /**
-     * @param page
-     * @param limit
-     * @param type
-     * @param [userId]
-     * @param [search]
+     * @param page 
+     * @param limit 
+     * @param type 
+     * @param userId 
+     * @param search 
      */
-    public authControllerGetEventsActivityByTypeWithHttpInfo(page: number, limit: number, type: string, userId?: string, search?: string, _options?: ConfigurationOptions): Observable<HttpInfo<ActivityResponseDto>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public authControllerGetEventsActivityByTypeWithHttpInfo(page: number, limit: number, type: string, userId?: string, search?: string, _options?: Configuration): Observable<HttpInfo<ActivityResponseDto>> {
+        const requestContextPromise = this.requestFactory.authControllerGetEventsActivityByType(page, limit, type, userId, search, _options);
 
-        const requestContextPromise = this.requestFactory.authControllerGetEventsActivityByType(page, limit, type, userId, search, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.authControllerGetEventsActivityByTypeWithHttpInfo(rsp)));
@@ -795,32 +774,31 @@ export class ObservableAuthApi {
     }
 
     /**
-     * @param page
-     * @param limit
-     * @param type
-     * @param [userId]
-     * @param [search]
+     * @param page 
+     * @param limit 
+     * @param type 
+     * @param userId 
+     * @param search 
      */
-    public authControllerGetEventsActivityByType(page: number, limit: number, type: string, userId?: string, search?: string, _options?: ConfigurationOptions): Observable<ActivityResponseDto> {
+    public authControllerGetEventsActivityByType(page: number, limit: number, type: string, userId?: string, search?: string, _options?: Configuration): Observable<ActivityResponseDto> {
         return this.authControllerGetEventsActivityByTypeWithHttpInfo(page, limit, type, userId, search, _options).pipe(map((apiResponse: HttpInfo<ActivityResponseDto>) => apiResponse.data));
     }
 
     /**
      */
-    public authControllerGetInterestsWithHttpInfo(_options?: ConfigurationOptions): Observable<HttpInfo<InterestsResponseDto>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public authControllerGetInterestsWithHttpInfo(_options?: Configuration): Observable<HttpInfo<InterestsResponseDto>> {
+        const requestContextPromise = this.requestFactory.authControllerGetInterests(_options);
 
-        const requestContextPromise = this.requestFactory.authControllerGetInterests(_config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.authControllerGetInterestsWithHttpInfo(rsp)));
@@ -829,26 +807,25 @@ export class ObservableAuthApi {
 
     /**
      */
-    public authControllerGetInterests(_options?: ConfigurationOptions): Observable<InterestsResponseDto> {
+    public authControllerGetInterests(_options?: Configuration): Observable<InterestsResponseDto> {
         return this.authControllerGetInterestsWithHttpInfo(_options).pipe(map((apiResponse: HttpInfo<InterestsResponseDto>) => apiResponse.data));
     }
 
     /**
      */
-    public authControllerGetPermissionWithHttpInfo(_options?: ConfigurationOptions): Observable<HttpInfo<void>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public authControllerGetPermissionWithHttpInfo(_options?: Configuration): Observable<HttpInfo<void>> {
+        const requestContextPromise = this.requestFactory.authControllerGetPermission(_options);
 
-        const requestContextPromise = this.requestFactory.authControllerGetPermission(_config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.authControllerGetPermissionWithHttpInfo(rsp)));
@@ -857,27 +834,26 @@ export class ObservableAuthApi {
 
     /**
      */
-    public authControllerGetPermission(_options?: ConfigurationOptions): Observable<void> {
+    public authControllerGetPermission(_options?: Configuration): Observable<void> {
         return this.authControllerGetPermissionWithHttpInfo(_options).pipe(map((apiResponse: HttpInfo<void>) => apiResponse.data));
     }
 
     /**
-     * @param email
+     * @param email 
      */
-    public authControllerGetStaffWithHttpInfo(email: string, _options?: ConfigurationOptions): Observable<HttpInfo<void>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public authControllerGetStaffWithHttpInfo(email: string, _options?: Configuration): Observable<HttpInfo<void>> {
+        const requestContextPromise = this.requestFactory.authControllerGetStaff(email, _options);
 
-        const requestContextPromise = this.requestFactory.authControllerGetStaff(email, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.authControllerGetStaffWithHttpInfo(rsp)));
@@ -885,29 +861,28 @@ export class ObservableAuthApi {
     }
 
     /**
-     * @param email
+     * @param email 
      */
-    public authControllerGetStaff(email: string, _options?: ConfigurationOptions): Observable<void> {
+    public authControllerGetStaff(email: string, _options?: Configuration): Observable<void> {
         return this.authControllerGetStaffWithHttpInfo(email, _options).pipe(map((apiResponse: HttpInfo<void>) => apiResponse.data));
     }
 
     /**
-     * @param id
+     * @param id 
      */
-    public authControllerGetStaffRoleWithHttpInfo(id: string, _options?: ConfigurationOptions): Observable<HttpInfo<void>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public authControllerGetStaffRoleWithHttpInfo(id: string, _options?: Configuration): Observable<HttpInfo<void>> {
+        const requestContextPromise = this.requestFactory.authControllerGetStaffRole(id, _options);
 
-        const requestContextPromise = this.requestFactory.authControllerGetStaffRole(id, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.authControllerGetStaffRoleWithHttpInfo(rsp)));
@@ -915,29 +890,28 @@ export class ObservableAuthApi {
     }
 
     /**
-     * @param id
+     * @param id 
      */
-    public authControllerGetStaffRole(id: string, _options?: ConfigurationOptions): Observable<void> {
+    public authControllerGetStaffRole(id: string, _options?: Configuration): Observable<void> {
         return this.authControllerGetStaffRoleWithHttpInfo(id, _options).pipe(map((apiResponse: HttpInfo<void>) => apiResponse.data));
     }
 
     /**
-     * @param loginPayloadDto
+     * @param loginPayloadDto 
      */
-    public authControllerLoginWithHttpInfo(loginPayloadDto: LoginPayloadDto, _options?: ConfigurationOptions): Observable<HttpInfo<UserResponseDto>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public authControllerLoginWithHttpInfo(loginPayloadDto: LoginPayloadDto, _options?: Configuration): Observable<HttpInfo<UserResponseDto>> {
+        const requestContextPromise = this.requestFactory.authControllerLogin(loginPayloadDto, _options);
 
-        const requestContextPromise = this.requestFactory.authControllerLogin(loginPayloadDto, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.authControllerLoginWithHttpInfo(rsp)));
@@ -945,29 +919,28 @@ export class ObservableAuthApi {
     }
 
     /**
-     * @param loginPayloadDto
+     * @param loginPayloadDto 
      */
-    public authControllerLogin(loginPayloadDto: LoginPayloadDto, _options?: ConfigurationOptions): Observable<UserResponseDto> {
+    public authControllerLogin(loginPayloadDto: LoginPayloadDto, _options?: Configuration): Observable<UserResponseDto> {
         return this.authControllerLoginWithHttpInfo(loginPayloadDto, _options).pipe(map((apiResponse: HttpInfo<UserResponseDto>) => apiResponse.data));
     }
 
     /**
-     * @param loggedOutPayloadDTO
+     * @param loggedOutPayloadDTO 
      */
-    public authControllerSignOutWithHttpInfo(loggedOutPayloadDTO: LoggedOutPayloadDTO, _options?: ConfigurationOptions): Observable<HttpInfo<LoggedOutResponse>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public authControllerSignOutWithHttpInfo(loggedOutPayloadDTO: LoggedOutPayloadDTO, _options?: Configuration): Observable<HttpInfo<LoggedOutResponse>> {
+        const requestContextPromise = this.requestFactory.authControllerSignOut(loggedOutPayloadDTO, _options);
 
-        const requestContextPromise = this.requestFactory.authControllerSignOut(loggedOutPayloadDTO, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.authControllerSignOutWithHttpInfo(rsp)));
@@ -975,33 +948,32 @@ export class ObservableAuthApi {
     }
 
     /**
-     * @param loggedOutPayloadDTO
+     * @param loggedOutPayloadDTO 
      */
-    public authControllerSignOut(loggedOutPayloadDTO: LoggedOutPayloadDTO, _options?: ConfigurationOptions): Observable<LoggedOutResponse> {
+    public authControllerSignOut(loggedOutPayloadDTO: LoggedOutPayloadDTO, _options?: Configuration): Observable<LoggedOutResponse> {
         return this.authControllerSignOutWithHttpInfo(loggedOutPayloadDTO, _options).pipe(map((apiResponse: HttpInfo<LoggedOutResponse>) => apiResponse.data));
     }
 
     /**
-     * @param page
-     * @param limit
-     * @param [allRoles]
-     * @param [ownerId]
-     * @param [search]
+     * @param page 
+     * @param limit 
+     * @param allRoles 
+     * @param ownerId 
+     * @param search 
      */
-    public authControllerStaffRolesWithHttpInfo(page: number, limit: number, allRoles?: boolean, ownerId?: string, search?: string, _options?: ConfigurationOptions): Observable<HttpInfo<void>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public authControllerStaffRolesWithHttpInfo(page: number, limit: number, allRoles?: boolean, ownerId?: string, search?: string, _options?: Configuration): Observable<HttpInfo<void>> {
+        const requestContextPromise = this.requestFactory.authControllerStaffRoles(page, limit, allRoles, ownerId, search, _options);
 
-        const requestContextPromise = this.requestFactory.authControllerStaffRoles(page, limit, allRoles, ownerId, search, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.authControllerStaffRolesWithHttpInfo(rsp)));
@@ -1009,33 +981,32 @@ export class ObservableAuthApi {
     }
 
     /**
-     * @param page
-     * @param limit
-     * @param [allRoles]
-     * @param [ownerId]
-     * @param [search]
+     * @param page 
+     * @param limit 
+     * @param allRoles 
+     * @param ownerId 
+     * @param search 
      */
-    public authControllerStaffRoles(page: number, limit: number, allRoles?: boolean, ownerId?: string, search?: string, _options?: ConfigurationOptions): Observable<void> {
+    public authControllerStaffRoles(page: number, limit: number, allRoles?: boolean, ownerId?: string, search?: string, _options?: Configuration): Observable<void> {
         return this.authControllerStaffRolesWithHttpInfo(page, limit, allRoles, ownerId, search, _options).pipe(map((apiResponse: HttpInfo<void>) => apiResponse.data));
     }
 
     /**
-     * @param superAdminLoginPayloadDto
+     * @param superAdminLoginPayloadDto 
      */
-    public authControllerSuperAdminLoginloginWithHttpInfo(superAdminLoginPayloadDto: SuperAdminLoginPayloadDto, _options?: ConfigurationOptions): Observable<HttpInfo<UserResponseDto>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public authControllerSuperAdminLoginloginWithHttpInfo(superAdminLoginPayloadDto: SuperAdminLoginPayloadDto, _options?: Configuration): Observable<HttpInfo<UserResponseDto>> {
+        const requestContextPromise = this.requestFactory.authControllerSuperAdminLoginlogin(superAdminLoginPayloadDto, _options);
 
-        const requestContextPromise = this.requestFactory.authControllerSuperAdminLoginlogin(superAdminLoginPayloadDto, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.authControllerSuperAdminLoginloginWithHttpInfo(rsp)));
@@ -1043,29 +1014,28 @@ export class ObservableAuthApi {
     }
 
     /**
-     * @param superAdminLoginPayloadDto
+     * @param superAdminLoginPayloadDto 
      */
-    public authControllerSuperAdminLoginlogin(superAdminLoginPayloadDto: SuperAdminLoginPayloadDto, _options?: ConfigurationOptions): Observable<UserResponseDto> {
+    public authControllerSuperAdminLoginlogin(superAdminLoginPayloadDto: SuperAdminLoginPayloadDto, _options?: Configuration): Observable<UserResponseDto> {
         return this.authControllerSuperAdminLoginloginWithHttpInfo(superAdminLoginPayloadDto, _options).pipe(map((apiResponse: HttpInfo<UserResponseDto>) => apiResponse.data));
     }
 
     /**
-     * @param userSyncDTO
+     * @param userSyncDTO 
      */
-    public authControllerSyncUserInfoWithHttpInfo(userSyncDTO: UserSyncDTO, _options?: ConfigurationOptions): Observable<HttpInfo<UserSyncResponseDto>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public authControllerSyncUserInfoWithHttpInfo(userSyncDTO: UserSyncDTO, _options?: Configuration): Observable<HttpInfo<UserSyncResponseDto>> {
+        const requestContextPromise = this.requestFactory.authControllerSyncUserInfo(userSyncDTO, _options);
 
-        const requestContextPromise = this.requestFactory.authControllerSyncUserInfo(userSyncDTO, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.authControllerSyncUserInfoWithHttpInfo(rsp)));
@@ -1073,29 +1043,28 @@ export class ObservableAuthApi {
     }
 
     /**
-     * @param userSyncDTO
+     * @param userSyncDTO 
      */
-    public authControllerSyncUserInfo(userSyncDTO: UserSyncDTO, _options?: ConfigurationOptions): Observable<UserSyncResponseDto> {
+    public authControllerSyncUserInfo(userSyncDTO: UserSyncDTO, _options?: Configuration): Observable<UserSyncResponseDto> {
         return this.authControllerSyncUserInfoWithHttpInfo(userSyncDTO, _options).pipe(map((apiResponse: HttpInfo<UserSyncResponseDto>) => apiResponse.data));
     }
 
     /**
-     * @param storeDetailsPayloadDto
+     * @param storeDetailsPayloadDto 
      */
-    public authControllerUpdateWithHttpInfo(storeDetailsPayloadDto: StoreDetailsPayloadDto, _options?: ConfigurationOptions): Observable<HttpInfo<UserResponseDto>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public authControllerUpdateWithHttpInfo(storeDetailsPayloadDto: StoreDetailsPayloadDto, _options?: Configuration): Observable<HttpInfo<UserResponseDto>> {
+        const requestContextPromise = this.requestFactory.authControllerUpdate(storeDetailsPayloadDto, _options);
 
-        const requestContextPromise = this.requestFactory.authControllerUpdate(storeDetailsPayloadDto, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.authControllerUpdateWithHttpInfo(rsp)));
@@ -1103,30 +1072,29 @@ export class ObservableAuthApi {
     }
 
     /**
-     * @param storeDetailsPayloadDto
+     * @param storeDetailsPayloadDto 
      */
-    public authControllerUpdate(storeDetailsPayloadDto: StoreDetailsPayloadDto, _options?: ConfigurationOptions): Observable<UserResponseDto> {
+    public authControllerUpdate(storeDetailsPayloadDto: StoreDetailsPayloadDto, _options?: Configuration): Observable<UserResponseDto> {
         return this.authControllerUpdateWithHttpInfo(storeDetailsPayloadDto, _options).pipe(map((apiResponse: HttpInfo<UserResponseDto>) => apiResponse.data));
     }
 
     /**
-     * @param id
-     * @param updateRoleDto
+     * @param id 
+     * @param updateRoleDto 
      */
-    public authControllerUpdateRolesWithHttpInfo(id: string, updateRoleDto: UpdateRoleDto, _options?: ConfigurationOptions): Observable<HttpInfo<void>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public authControllerUpdateRolesWithHttpInfo(id: string, updateRoleDto: UpdateRoleDto, _options?: Configuration): Observable<HttpInfo<void>> {
+        const requestContextPromise = this.requestFactory.authControllerUpdateRoles(id, updateRoleDto, _options);
 
-        const requestContextPromise = this.requestFactory.authControllerUpdateRoles(id, updateRoleDto, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.authControllerUpdateRolesWithHttpInfo(rsp)));
@@ -1134,31 +1102,30 @@ export class ObservableAuthApi {
     }
 
     /**
-     * @param id
-     * @param updateRoleDto
+     * @param id 
+     * @param updateRoleDto 
      */
-    public authControllerUpdateRoles(id: string, updateRoleDto: UpdateRoleDto, _options?: ConfigurationOptions): Observable<void> {
+    public authControllerUpdateRoles(id: string, updateRoleDto: UpdateRoleDto, _options?: Configuration): Observable<void> {
         return this.authControllerUpdateRolesWithHttpInfo(id, updateRoleDto, _options).pipe(map((apiResponse: HttpInfo<void>) => apiResponse.data));
     }
 
     /**
-     * @param id
-     * @param updateStaffDto
+     * @param id 
+     * @param updateStaffDto 
      */
-    public authControllerUpdateStaffWithHttpInfo(id: string, updateStaffDto: UpdateStaffDto, _options?: ConfigurationOptions): Observable<HttpInfo<void>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public authControllerUpdateStaffWithHttpInfo(id: string, updateStaffDto: UpdateStaffDto, _options?: Configuration): Observable<HttpInfo<void>> {
+        const requestContextPromise = this.requestFactory.authControllerUpdateStaff(id, updateStaffDto, _options);
 
-        const requestContextPromise = this.requestFactory.authControllerUpdateStaff(id, updateStaffDto, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.authControllerUpdateStaffWithHttpInfo(rsp)));
@@ -1166,31 +1133,30 @@ export class ObservableAuthApi {
     }
 
     /**
-     * @param id
-     * @param updateStaffDto
+     * @param id 
+     * @param updateStaffDto 
      */
-    public authControllerUpdateStaff(id: string, updateStaffDto: UpdateStaffDto, _options?: ConfigurationOptions): Observable<void> {
+    public authControllerUpdateStaff(id: string, updateStaffDto: UpdateStaffDto, _options?: Configuration): Observable<void> {
         return this.authControllerUpdateStaffWithHttpInfo(id, updateStaffDto, _options).pipe(map((apiResponse: HttpInfo<void>) => apiResponse.data));
     }
 
     /**
-     * @param id
-     * @param updateStaffRoleDto
+     * @param id 
+     * @param updateStaffRoleDto 
      */
-    public authControllerUpdateStaffRolesWithHttpInfo(id: string, updateStaffRoleDto: UpdateStaffRoleDto, _options?: ConfigurationOptions): Observable<HttpInfo<void>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public authControllerUpdateStaffRolesWithHttpInfo(id: string, updateStaffRoleDto: UpdateStaffRoleDto, _options?: Configuration): Observable<HttpInfo<void>> {
+        const requestContextPromise = this.requestFactory.authControllerUpdateStaffRoles(id, updateStaffRoleDto, _options);
 
-        const requestContextPromise = this.requestFactory.authControllerUpdateStaffRoles(id, updateStaffRoleDto, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.authControllerUpdateStaffRolesWithHttpInfo(rsp)));
@@ -1198,33 +1164,32 @@ export class ObservableAuthApi {
     }
 
     /**
-     * @param id
-     * @param updateStaffRoleDto
+     * @param id 
+     * @param updateStaffRoleDto 
      */
-    public authControllerUpdateStaffRoles(id: string, updateStaffRoleDto: UpdateStaffRoleDto, _options?: ConfigurationOptions): Observable<void> {
+    public authControllerUpdateStaffRoles(id: string, updateStaffRoleDto: UpdateStaffRoleDto, _options?: Configuration): Observable<void> {
         return this.authControllerUpdateStaffRolesWithHttpInfo(id, updateStaffRoleDto, _options).pipe(map((apiResponse: HttpInfo<void>) => apiResponse.data));
     }
 
     /**
-     * @param page
-     * @param limit
-     * @param [allRoles]
-     * @param [search]
+     * @param page 
+     * @param limit 
+     * @param allRoles 
+     * @param search 
      */
-    public authControllerUserWithHttpInfo(page: number, limit: number, allRoles?: boolean, search?: string, _options?: ConfigurationOptions): Observable<HttpInfo<void>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public authControllerUserWithHttpInfo(page: number, limit: number, allRoles?: boolean, search?: string, _options?: Configuration): Observable<HttpInfo<void>> {
+        const requestContextPromise = this.requestFactory.authControllerUser(page, limit, allRoles, search, _options);
 
-        const requestContextPromise = this.requestFactory.authControllerUser(page, limit, allRoles, search, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.authControllerUserWithHttpInfo(rsp)));
@@ -1232,32 +1197,31 @@ export class ObservableAuthApi {
     }
 
     /**
-     * @param page
-     * @param limit
-     * @param [allRoles]
-     * @param [search]
+     * @param page 
+     * @param limit 
+     * @param allRoles 
+     * @param search 
      */
-    public authControllerUser(page: number, limit: number, allRoles?: boolean, search?: string, _options?: ConfigurationOptions): Observable<void> {
+    public authControllerUser(page: number, limit: number, allRoles?: boolean, search?: string, _options?: Configuration): Observable<void> {
         return this.authControllerUserWithHttpInfo(page, limit, allRoles, search, _options).pipe(map((apiResponse: HttpInfo<void>) => apiResponse.data));
     }
 
     /**
-     * @param id
+     * @param id 
      */
-    public authControllerUserByIdWithHttpInfo(id: string, _options?: ConfigurationOptions): Observable<HttpInfo<UserResponseDto>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public authControllerUserByIdWithHttpInfo(id: string, _options?: Configuration): Observable<HttpInfo<UserResponseDto>> {
+        const requestContextPromise = this.requestFactory.authControllerUserById(id, _options);
 
-        const requestContextPromise = this.requestFactory.authControllerUserById(id, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.authControllerUserByIdWithHttpInfo(rsp)));
@@ -1265,29 +1229,28 @@ export class ObservableAuthApi {
     }
 
     /**
-     * @param id
+     * @param id 
      */
-    public authControllerUserById(id: string, _options?: ConfigurationOptions): Observable<UserResponseDto> {
+    public authControllerUserById(id: string, _options?: Configuration): Observable<UserResponseDto> {
         return this.authControllerUserByIdWithHttpInfo(id, _options).pipe(map((apiResponse: HttpInfo<UserResponseDto>) => apiResponse.data));
     }
 
     /**
-     * @param id
+     * @param id 
      */
-    public authControllerUserFollowersWithHttpInfo(id: string, _options?: ConfigurationOptions): Observable<HttpInfo<UserFollowerResponseDto>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public authControllerUserFollowersWithHttpInfo(id: string, _options?: Configuration): Observable<HttpInfo<UserFollowerResponseDto>> {
+        const requestContextPromise = this.requestFactory.authControllerUserFollowers(id, _options);
 
-        const requestContextPromise = this.requestFactory.authControllerUserFollowers(id, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.authControllerUserFollowersWithHttpInfo(rsp)));
@@ -1295,28 +1258,27 @@ export class ObservableAuthApi {
     }
 
     /**
-     * @param id
+     * @param id 
      */
-    public authControllerUserFollowers(id: string, _options?: ConfigurationOptions): Observable<UserFollowerResponseDto> {
+    public authControllerUserFollowers(id: string, _options?: Configuration): Observable<UserFollowerResponseDto> {
         return this.authControllerUserFollowersWithHttpInfo(id, _options).pipe(map((apiResponse: HttpInfo<UserFollowerResponseDto>) => apiResponse.data));
     }
 
     /**
      */
-    public authControllerUserMeWithHttpInfo(_options?: ConfigurationOptions): Observable<HttpInfo<UserResponseDto>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public authControllerUserMeWithHttpInfo(_options?: Configuration): Observable<HttpInfo<UserResponseDto>> {
+        const requestContextPromise = this.requestFactory.authControllerUserMe(_options);
 
-        const requestContextPromise = this.requestFactory.authControllerUserMe(_config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.authControllerUserMeWithHttpInfo(rsp)));
@@ -1325,27 +1287,26 @@ export class ObservableAuthApi {
 
     /**
      */
-    public authControllerUserMe(_options?: ConfigurationOptions): Observable<UserResponseDto> {
+    public authControllerUserMe(_options?: Configuration): Observable<UserResponseDto> {
         return this.authControllerUserMeWithHttpInfo(_options).pipe(map((apiResponse: HttpInfo<UserResponseDto>) => apiResponse.data));
     }
 
     /**
-     * @param userRolePayloadDto
+     * @param userRolePayloadDto 
      */
-    public authControllerUserRoleUpdateWithHttpInfo(userRolePayloadDto: UserRolePayloadDto, _options?: ConfigurationOptions): Observable<HttpInfo<UserResponseDto>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public authControllerUserRoleUpdateWithHttpInfo(userRolePayloadDto: UserRolePayloadDto, _options?: Configuration): Observable<HttpInfo<UserResponseDto>> {
+        const requestContextPromise = this.requestFactory.authControllerUserRoleUpdate(userRolePayloadDto, _options);
 
-        const requestContextPromise = this.requestFactory.authControllerUserRoleUpdate(userRolePayloadDto, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.authControllerUserRoleUpdateWithHttpInfo(rsp)));
@@ -1353,29 +1314,28 @@ export class ObservableAuthApi {
     }
 
     /**
-     * @param userRolePayloadDto
+     * @param userRolePayloadDto 
      */
-    public authControllerUserRoleUpdate(userRolePayloadDto: UserRolePayloadDto, _options?: ConfigurationOptions): Observable<UserResponseDto> {
+    public authControllerUserRoleUpdate(userRolePayloadDto: UserRolePayloadDto, _options?: Configuration): Observable<UserResponseDto> {
         return this.authControllerUserRoleUpdateWithHttpInfo(userRolePayloadDto, _options).pipe(map((apiResponse: HttpInfo<UserResponseDto>) => apiResponse.data));
     }
 
     /**
-     * @param userUpdatePayloadDto
+     * @param userUpdatePayloadDto 
      */
-    public authControllerUserUpdateWithHttpInfo(userUpdatePayloadDto: UserUpdatePayloadDto, _options?: ConfigurationOptions): Observable<HttpInfo<UserResponseDto>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public authControllerUserUpdateWithHttpInfo(userUpdatePayloadDto: UserUpdatePayloadDto, _options?: Configuration): Observable<HttpInfo<UserResponseDto>> {
+        const requestContextPromise = this.requestFactory.authControllerUserUpdate(userUpdatePayloadDto, _options);
 
-        const requestContextPromise = this.requestFactory.authControllerUserUpdate(userUpdatePayloadDto, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.authControllerUserUpdateWithHttpInfo(rsp)));
@@ -1383,29 +1343,28 @@ export class ObservableAuthApi {
     }
 
     /**
-     * @param userUpdatePayloadDto
+     * @param userUpdatePayloadDto 
      */
-    public authControllerUserUpdate(userUpdatePayloadDto: UserUpdatePayloadDto, _options?: ConfigurationOptions): Observable<UserResponseDto> {
+    public authControllerUserUpdate(userUpdatePayloadDto: UserUpdatePayloadDto, _options?: Configuration): Observable<UserResponseDto> {
         return this.authControllerUserUpdateWithHttpInfo(userUpdatePayloadDto, _options).pipe(map((apiResponse: HttpInfo<UserResponseDto>) => apiResponse.data));
     }
 
     /**
-     * @param otpEntityPayloadDto
+     * @param otpEntityPayloadDto 
      */
-    public authControllerVerifyOtpWithHttpInfo(otpEntityPayloadDto: OtpEntityPayloadDto, _options?: ConfigurationOptions): Observable<HttpInfo<ForgetPasswordEntityResponseDto>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public authControllerVerifyOtpWithHttpInfo(otpEntityPayloadDto: OtpEntityPayloadDto, _options?: Configuration): Observable<HttpInfo<ForgetPasswordEntityResponseDto>> {
+        const requestContextPromise = this.requestFactory.authControllerVerifyOtp(otpEntityPayloadDto, _options);
 
-        const requestContextPromise = this.requestFactory.authControllerVerifyOtp(otpEntityPayloadDto, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.authControllerVerifyOtpWithHttpInfo(rsp)));
@@ -1413,9 +1372,9 @@ export class ObservableAuthApi {
     }
 
     /**
-     * @param otpEntityPayloadDto
+     * @param otpEntityPayloadDto 
      */
-    public authControllerVerifyOtp(otpEntityPayloadDto: OtpEntityPayloadDto, _options?: ConfigurationOptions): Observable<ForgetPasswordEntityResponseDto> {
+    public authControllerVerifyOtp(otpEntityPayloadDto: OtpEntityPayloadDto, _options?: Configuration): Observable<ForgetPasswordEntityResponseDto> {
         return this.authControllerVerifyOtpWithHttpInfo(otpEntityPayloadDto, _options).pipe(map((apiResponse: HttpInfo<ForgetPasswordEntityResponseDto>) => apiResponse.data));
     }
 
@@ -1438,22 +1397,21 @@ export class ObservableBooksApi {
     }
 
     /**
-     * @param bookPayloadDto
+     * @param bookPayloadDto 
      */
-    public bookControllerAddBookWithHttpInfo(bookPayloadDto: BookPayloadDto, _options?: ConfigurationOptions): Observable<HttpInfo<BookResponseDto>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public bookControllerAddBookWithHttpInfo(bookPayloadDto: BookPayloadDto, _options?: Configuration): Observable<HttpInfo<BookResponseDto>> {
+        const requestContextPromise = this.requestFactory.bookControllerAddBook(bookPayloadDto, _options);
 
-        const requestContextPromise = this.requestFactory.bookControllerAddBook(bookPayloadDto, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.bookControllerAddBookWithHttpInfo(rsp)));
@@ -1461,29 +1419,28 @@ export class ObservableBooksApi {
     }
 
     /**
-     * @param bookPayloadDto
+     * @param bookPayloadDto 
      */
-    public bookControllerAddBook(bookPayloadDto: BookPayloadDto, _options?: ConfigurationOptions): Observable<BookResponseDto> {
+    public bookControllerAddBook(bookPayloadDto: BookPayloadDto, _options?: Configuration): Observable<BookResponseDto> {
         return this.bookControllerAddBookWithHttpInfo(bookPayloadDto, _options).pipe(map((apiResponse: HttpInfo<BookResponseDto>) => apiResponse.data));
     }
 
     /**
-     * @param requestBody
+     * @param requestBody 
      */
-    public bookControllerAddMyGoodReadsBooksWithHttpInfo(requestBody: Array<string>, _options?: ConfigurationOptions): Observable<HttpInfo<BooksStatusResponseDto>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public bookControllerAddMyGoodReadsBooksWithHttpInfo(requestBody: Array<string>, _options?: Configuration): Observable<HttpInfo<BooksStatusResponseDto>> {
+        const requestContextPromise = this.requestFactory.bookControllerAddMyGoodReadsBooks(requestBody, _options);
 
-        const requestContextPromise = this.requestFactory.bookControllerAddMyGoodReadsBooks(requestBody, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.bookControllerAddMyGoodReadsBooksWithHttpInfo(rsp)));
@@ -1491,29 +1448,28 @@ export class ObservableBooksApi {
     }
 
     /**
-     * @param requestBody
+     * @param requestBody 
      */
-    public bookControllerAddMyGoodReadsBooks(requestBody: Array<string>, _options?: ConfigurationOptions): Observable<BooksStatusResponseDto> {
+    public bookControllerAddMyGoodReadsBooks(requestBody: Array<string>, _options?: Configuration): Observable<BooksStatusResponseDto> {
         return this.bookControllerAddMyGoodReadsBooksWithHttpInfo(requestBody, _options).pipe(map((apiResponse: HttpInfo<BooksStatusResponseDto>) => apiResponse.data));
     }
 
     /**
-     * @param readingGoalPayload
+     * @param readingGoalPayload 
      */
-    public bookControllerAddReadingGoalWithHttpInfo(readingGoalPayload: ReadingGoalPayload, _options?: ConfigurationOptions): Observable<HttpInfo<ReadingGoalResponseDTO>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public bookControllerAddReadingGoalWithHttpInfo(readingGoalPayload: ReadingGoalPayload, _options?: Configuration): Observable<HttpInfo<ReadingGoalResponseDTO>> {
+        const requestContextPromise = this.requestFactory.bookControllerAddReadingGoal(readingGoalPayload, _options);
 
-        const requestContextPromise = this.requestFactory.bookControllerAddReadingGoal(readingGoalPayload, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.bookControllerAddReadingGoalWithHttpInfo(rsp)));
@@ -1521,29 +1477,28 @@ export class ObservableBooksApi {
     }
 
     /**
-     * @param readingGoalPayload
+     * @param readingGoalPayload 
      */
-    public bookControllerAddReadingGoal(readingGoalPayload: ReadingGoalPayload, _options?: ConfigurationOptions): Observable<ReadingGoalResponseDTO> {
+    public bookControllerAddReadingGoal(readingGoalPayload: ReadingGoalPayload, _options?: Configuration): Observable<ReadingGoalResponseDTO> {
         return this.bookControllerAddReadingGoalWithHttpInfo(readingGoalPayload, _options).pipe(map((apiResponse: HttpInfo<ReadingGoalResponseDTO>) => apiResponse.data));
     }
 
     /**
-     * @param topBookPayload
+     * @param topBookPayload 
      */
-    public bookControllerAddTopBookWithHttpInfo(topBookPayload: TopBookPayload, _options?: ConfigurationOptions): Observable<HttpInfo<TopBooksResponseDTO>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public bookControllerAddTopBookWithHttpInfo(topBookPayload: TopBookPayload, _options?: Configuration): Observable<HttpInfo<TopBooksResponseDTO>> {
+        const requestContextPromise = this.requestFactory.bookControllerAddTopBook(topBookPayload, _options);
 
-        const requestContextPromise = this.requestFactory.bookControllerAddTopBook(topBookPayload, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.bookControllerAddTopBookWithHttpInfo(rsp)));
@@ -1551,29 +1506,28 @@ export class ObservableBooksApi {
     }
 
     /**
-     * @param topBookPayload
+     * @param topBookPayload 
      */
-    public bookControllerAddTopBook(topBookPayload: TopBookPayload, _options?: ConfigurationOptions): Observable<TopBooksResponseDTO> {
+    public bookControllerAddTopBook(topBookPayload: TopBookPayload, _options?: Configuration): Observable<TopBooksResponseDTO> {
         return this.bookControllerAddTopBookWithHttpInfo(topBookPayload, _options).pipe(map((apiResponse: HttpInfo<TopBooksResponseDTO>) => apiResponse.data));
     }
 
     /**
-     * @param userBookPayloadDto
+     * @param userBookPayloadDto 
      */
-    public bookControllerDeleteReviewWithHttpInfo(userBookPayloadDto: UserBookPayloadDto, _options?: ConfigurationOptions): Observable<HttpInfo<UserBookDeleteResponseDto>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public bookControllerDeleteReviewWithHttpInfo(userBookPayloadDto: UserBookPayloadDto, _options?: Configuration): Observable<HttpInfo<UserBookDeleteResponseDto>> {
+        const requestContextPromise = this.requestFactory.bookControllerDeleteReview(userBookPayloadDto, _options);
 
-        const requestContextPromise = this.requestFactory.bookControllerDeleteReview(userBookPayloadDto, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.bookControllerDeleteReviewWithHttpInfo(rsp)));
@@ -1581,29 +1535,28 @@ export class ObservableBooksApi {
     }
 
     /**
-     * @param userBookPayloadDto
+     * @param userBookPayloadDto 
      */
-    public bookControllerDeleteReview(userBookPayloadDto: UserBookPayloadDto, _options?: ConfigurationOptions): Observable<UserBookDeleteResponseDto> {
+    public bookControllerDeleteReview(userBookPayloadDto: UserBookPayloadDto, _options?: Configuration): Observable<UserBookDeleteResponseDto> {
         return this.bookControllerDeleteReviewWithHttpInfo(userBookPayloadDto, _options).pipe(map((apiResponse: HttpInfo<UserBookDeleteResponseDto>) => apiResponse.data));
     }
 
     /**
-     * @param id
+     * @param id 
      */
-    public bookControllerFindBookByIdWithHttpInfo(id: string, _options?: ConfigurationOptions): Observable<HttpInfo<BookResponseDto>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public bookControllerFindBookByIdWithHttpInfo(id: string, _options?: Configuration): Observable<HttpInfo<BookResponseDto>> {
+        const requestContextPromise = this.requestFactory.bookControllerFindBookById(id, _options);
 
-        const requestContextPromise = this.requestFactory.bookControllerFindBookById(id, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.bookControllerFindBookByIdWithHttpInfo(rsp)));
@@ -1611,29 +1564,28 @@ export class ObservableBooksApi {
     }
 
     /**
-     * @param id
+     * @param id 
      */
-    public bookControllerFindBookById(id: string, _options?: ConfigurationOptions): Observable<BookResponseDto> {
+    public bookControllerFindBookById(id: string, _options?: Configuration): Observable<BookResponseDto> {
         return this.bookControllerFindBookByIdWithHttpInfo(id, _options).pipe(map((apiResponse: HttpInfo<BookResponseDto>) => apiResponse.data));
     }
 
     /**
-     * @param bookByStatusDto
+     * @param bookByStatusDto 
      */
-    public bookControllerFindBookByStatusWithHttpInfo(bookByStatusDto: BookByStatusDto, _options?: ConfigurationOptions): Observable<HttpInfo<BooksReviewResponseDto>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public bookControllerFindBookByStatusWithHttpInfo(bookByStatusDto: BookByStatusDto, _options?: Configuration): Observable<HttpInfo<BooksReviewResponseDto>> {
+        const requestContextPromise = this.requestFactory.bookControllerFindBookByStatus(bookByStatusDto, _options);
 
-        const requestContextPromise = this.requestFactory.bookControllerFindBookByStatus(bookByStatusDto, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.bookControllerFindBookByStatusWithHttpInfo(rsp)));
@@ -1641,29 +1593,28 @@ export class ObservableBooksApi {
     }
 
     /**
-     * @param bookByStatusDto
+     * @param bookByStatusDto 
      */
-    public bookControllerFindBookByStatus(bookByStatusDto: BookByStatusDto, _options?: ConfigurationOptions): Observable<BooksReviewResponseDto> {
+    public bookControllerFindBookByStatus(bookByStatusDto: BookByStatusDto, _options?: Configuration): Observable<BooksReviewResponseDto> {
         return this.bookControllerFindBookByStatusWithHttpInfo(bookByStatusDto, _options).pipe(map((apiResponse: HttpInfo<BooksReviewResponseDto>) => apiResponse.data));
     }
 
     /**
-     * @param userBookStatusQueryDto
+     * @param userBookStatusQueryDto 
      */
-    public bookControllerFindBookReviewBaseWithHttpInfo(userBookStatusQueryDto: UserBookStatusQueryDto, _options?: ConfigurationOptions): Observable<HttpInfo<BooksReviewResponseDto>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public bookControllerFindBookReviewBaseWithHttpInfo(userBookStatusQueryDto: UserBookStatusQueryDto, _options?: Configuration): Observable<HttpInfo<BooksReviewResponseDto>> {
+        const requestContextPromise = this.requestFactory.bookControllerFindBookReviewBase(userBookStatusQueryDto, _options);
 
-        const requestContextPromise = this.requestFactory.bookControllerFindBookReviewBase(userBookStatusQueryDto, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.bookControllerFindBookReviewBaseWithHttpInfo(rsp)));
@@ -1671,34 +1622,33 @@ export class ObservableBooksApi {
     }
 
     /**
-     * @param userBookStatusQueryDto
+     * @param userBookStatusQueryDto 
      */
-    public bookControllerFindBookReviewBase(userBookStatusQueryDto: UserBookStatusQueryDto, _options?: ConfigurationOptions): Observable<BooksReviewResponseDto> {
+    public bookControllerFindBookReviewBase(userBookStatusQueryDto: UserBookStatusQueryDto, _options?: Configuration): Observable<BooksReviewResponseDto> {
         return this.bookControllerFindBookReviewBaseWithHttpInfo(userBookStatusQueryDto, _options).pipe(map((apiResponse: HttpInfo<BooksReviewResponseDto>) => apiResponse.data));
     }
 
     /**
-     * @param rate
-     * @param page
-     * @param limit
-     * @param [search]
-     * @param [isPrompt]
-     * @param [user]
+     * @param rate 
+     * @param page 
+     * @param limit 
+     * @param search 
+     * @param isPrompt 
+     * @param user 
      */
-    public bookControllerFindBooksWithHttpInfo(rate: number, page: number, limit: number, search?: string, isPrompt?: boolean, user?: string, _options?: ConfigurationOptions): Observable<HttpInfo<BooksResponseDto>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public bookControllerFindBooksWithHttpInfo(rate: number, page: number, limit: number, search?: string, isPrompt?: boolean, user?: string, _options?: Configuration): Observable<HttpInfo<BooksResponseDto>> {
+        const requestContextPromise = this.requestFactory.bookControllerFindBooks(rate, page, limit, search, isPrompt, user, _options);
 
-        const requestContextPromise = this.requestFactory.bookControllerFindBooks(rate, page, limit, search, isPrompt, user, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.bookControllerFindBooksWithHttpInfo(rsp)));
@@ -1706,34 +1656,33 @@ export class ObservableBooksApi {
     }
 
     /**
-     * @param rate
-     * @param page
-     * @param limit
-     * @param [search]
-     * @param [isPrompt]
-     * @param [user]
+     * @param rate 
+     * @param page 
+     * @param limit 
+     * @param search 
+     * @param isPrompt 
+     * @param user 
      */
-    public bookControllerFindBooks(rate: number, page: number, limit: number, search?: string, isPrompt?: boolean, user?: string, _options?: ConfigurationOptions): Observable<BooksResponseDto> {
+    public bookControllerFindBooks(rate: number, page: number, limit: number, search?: string, isPrompt?: boolean, user?: string, _options?: Configuration): Observable<BooksResponseDto> {
         return this.bookControllerFindBooksWithHttpInfo(rate, page, limit, search, isPrompt, user, _options).pipe(map((apiResponse: HttpInfo<BooksResponseDto>) => apiResponse.data));
     }
 
     /**
-     * @param goodReadsBookPayloadDto
+     * @param goodReadsBookPayloadDto 
      */
-    public bookControllerFindGoodReadsWithHttpInfo(goodReadsBookPayloadDto: GoodReadsBookPayloadDto, _options?: ConfigurationOptions): Observable<HttpInfo<BooksReviewResponseDto>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public bookControllerFindGoodReadsWithHttpInfo(goodReadsBookPayloadDto: GoodReadsBookPayloadDto, _options?: Configuration): Observable<HttpInfo<BooksReviewResponseDto>> {
+        const requestContextPromise = this.requestFactory.bookControllerFindGoodReads(goodReadsBookPayloadDto, _options);
 
-        const requestContextPromise = this.requestFactory.bookControllerFindGoodReads(goodReadsBookPayloadDto, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.bookControllerFindGoodReadsWithHttpInfo(rsp)));
@@ -1741,29 +1690,28 @@ export class ObservableBooksApi {
     }
 
     /**
-     * @param goodReadsBookPayloadDto
+     * @param goodReadsBookPayloadDto 
      */
-    public bookControllerFindGoodReads(goodReadsBookPayloadDto: GoodReadsBookPayloadDto, _options?: ConfigurationOptions): Observable<BooksReviewResponseDto> {
+    public bookControllerFindGoodReads(goodReadsBookPayloadDto: GoodReadsBookPayloadDto, _options?: Configuration): Observable<BooksReviewResponseDto> {
         return this.bookControllerFindGoodReadsWithHttpInfo(goodReadsBookPayloadDto, _options).pipe(map((apiResponse: HttpInfo<BooksReviewResponseDto>) => apiResponse.data));
     }
 
     /**
-     * @param user
+     * @param user 
      */
-    public bookControllerFindReadingGoalWithHttpInfo(user: string, _options?: ConfigurationOptions): Observable<HttpInfo<ReadingGoalResponseDTO>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public bookControllerFindReadingGoalWithHttpInfo(user: string, _options?: Configuration): Observable<HttpInfo<ReadingGoalResponseDTO>> {
+        const requestContextPromise = this.requestFactory.bookControllerFindReadingGoal(user, _options);
 
-        const requestContextPromise = this.requestFactory.bookControllerFindReadingGoal(user, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.bookControllerFindReadingGoalWithHttpInfo(rsp)));
@@ -1771,34 +1719,33 @@ export class ObservableBooksApi {
     }
 
     /**
-     * @param user
+     * @param user 
      */
-    public bookControllerFindReadingGoal(user: string, _options?: ConfigurationOptions): Observable<ReadingGoalResponseDTO> {
+    public bookControllerFindReadingGoal(user: string, _options?: Configuration): Observable<ReadingGoalResponseDTO> {
         return this.bookControllerFindReadingGoalWithHttpInfo(user, _options).pipe(map((apiResponse: HttpInfo<ReadingGoalResponseDTO>) => apiResponse.data));
     }
 
     /**
-     * @param rate
-     * @param page
-     * @param limit
-     * @param [search]
-     * @param [isPrompt]
-     * @param [user]
+     * @param rate 
+     * @param page 
+     * @param limit 
+     * @param search 
+     * @param isPrompt 
+     * @param user 
      */
-    public bookControllerFindTopBooksWithHttpInfo(rate: number, page: number, limit: number, search?: string, isPrompt?: boolean, user?: string, _options?: ConfigurationOptions): Observable<HttpInfo<BooksReviewResponseDto>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public bookControllerFindTopBooksWithHttpInfo(rate: number, page: number, limit: number, search?: string, isPrompt?: boolean, user?: string, _options?: Configuration): Observable<HttpInfo<BooksReviewResponseDto>> {
+        const requestContextPromise = this.requestFactory.bookControllerFindTopBooks(rate, page, limit, search, isPrompt, user, _options);
 
-        const requestContextPromise = this.requestFactory.bookControllerFindTopBooks(rate, page, limit, search, isPrompt, user, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.bookControllerFindTopBooksWithHttpInfo(rsp)));
@@ -1806,37 +1753,36 @@ export class ObservableBooksApi {
     }
 
     /**
-     * @param rate
-     * @param page
-     * @param limit
-     * @param [search]
-     * @param [isPrompt]
-     * @param [user]
+     * @param rate 
+     * @param page 
+     * @param limit 
+     * @param search 
+     * @param isPrompt 
+     * @param user 
      */
-    public bookControllerFindTopBooks(rate: number, page: number, limit: number, search?: string, isPrompt?: boolean, user?: string, _options?: ConfigurationOptions): Observable<BooksReviewResponseDto> {
+    public bookControllerFindTopBooks(rate: number, page: number, limit: number, search?: string, isPrompt?: boolean, user?: string, _options?: Configuration): Observable<BooksReviewResponseDto> {
         return this.bookControllerFindTopBooksWithHttpInfo(rate, page, limit, search, isPrompt, user, _options).pipe(map((apiResponse: HttpInfo<BooksReviewResponseDto>) => apiResponse.data));
     }
 
     /**
-     * @param bookId
-     * @param [status]
-     * @param [rate]
-     * @param [review]
+     * @param bookId 
+     * @param status 
+     * @param rate 
+     * @param review 
      */
-    public bookControllerFindUserBookReviewWithHttpInfo(bookId: string, status?: string, rate?: number, review?: string, _options?: ConfigurationOptions): Observable<HttpInfo<UserBookReviewResponseDto>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public bookControllerFindUserBookReviewWithHttpInfo(bookId: string, status?: string, rate?: number, review?: string, _options?: Configuration): Observable<HttpInfo<UserBookReviewResponseDto>> {
+        const requestContextPromise = this.requestFactory.bookControllerFindUserBookReview(bookId, status, rate, review, _options);
 
-        const requestContextPromise = this.requestFactory.bookControllerFindUserBookReview(bookId, status, rate, review, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.bookControllerFindUserBookReviewWithHttpInfo(rsp)));
@@ -1844,35 +1790,34 @@ export class ObservableBooksApi {
     }
 
     /**
-     * @param bookId
-     * @param [status]
-     * @param [rate]
-     * @param [review]
+     * @param bookId 
+     * @param status 
+     * @param rate 
+     * @param review 
      */
-    public bookControllerFindUserBookReview(bookId: string, status?: string, rate?: number, review?: string, _options?: ConfigurationOptions): Observable<UserBookReviewResponseDto> {
+    public bookControllerFindUserBookReview(bookId: string, status?: string, rate?: number, review?: string, _options?: Configuration): Observable<UserBookReviewResponseDto> {
         return this.bookControllerFindUserBookReviewWithHttpInfo(bookId, status, rate, review, _options).pipe(map((apiResponse: HttpInfo<UserBookReviewResponseDto>) => apiResponse.data));
     }
 
     /**
-     * @param bookId
-     * @param [status]
-     * @param [rate]
-     * @param [review]
+     * @param bookId 
+     * @param status 
+     * @param rate 
+     * @param review 
      */
-    public bookControllerFindUserBookReviewCountWithHttpInfo(bookId: string, status?: string, rate?: number, review?: string, _options?: ConfigurationOptions): Observable<HttpInfo<BookReviewCountResponseDto>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public bookControllerFindUserBookReviewCountWithHttpInfo(bookId: string, status?: string, rate?: number, review?: string, _options?: Configuration): Observable<HttpInfo<BookReviewCountResponseDto>> {
+        const requestContextPromise = this.requestFactory.bookControllerFindUserBookReviewCount(bookId, status, rate, review, _options);
 
-        const requestContextPromise = this.requestFactory.bookControllerFindUserBookReviewCount(bookId, status, rate, review, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.bookControllerFindUserBookReviewCountWithHttpInfo(rsp)));
@@ -1880,36 +1825,35 @@ export class ObservableBooksApi {
     }
 
     /**
-     * @param bookId
-     * @param [status]
-     * @param [rate]
-     * @param [review]
+     * @param bookId 
+     * @param status 
+     * @param rate 
+     * @param review 
      */
-    public bookControllerFindUserBookReviewCount(bookId: string, status?: string, rate?: number, review?: string, _options?: ConfigurationOptions): Observable<BookReviewCountResponseDto> {
+    public bookControllerFindUserBookReviewCount(bookId: string, status?: string, rate?: number, review?: string, _options?: Configuration): Observable<BookReviewCountResponseDto> {
         return this.bookControllerFindUserBookReviewCountWithHttpInfo(bookId, status, rate, review, _options).pipe(map((apiResponse: HttpInfo<BookReviewCountResponseDto>) => apiResponse.data));
     }
 
     /**
-     * @param bookId
-     * @param page
-     * @param limit
-     * @param [userId]
-     * @param [rate]
+     * @param bookId 
+     * @param page 
+     * @param limit 
+     * @param userId 
+     * @param rate 
      */
-    public bookControllerFindUserBookReviewsWithHttpInfo(bookId: string, page: number, limit: number, userId?: string, rate?: Array<number>, _options?: ConfigurationOptions): Observable<HttpInfo<UserBooksResponseDto>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public bookControllerFindUserBookReviewsWithHttpInfo(bookId: string, page: number, limit: number, userId?: string, rate?: Array<number>, _options?: Configuration): Observable<HttpInfo<UserBooksResponseDto>> {
+        const requestContextPromise = this.requestFactory.bookControllerFindUserBookReviews(bookId, page, limit, userId, rate, _options);
 
-        const requestContextPromise = this.requestFactory.bookControllerFindUserBookReviews(bookId, page, limit, userId, rate, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.bookControllerFindUserBookReviewsWithHttpInfo(rsp)));
@@ -1917,32 +1861,31 @@ export class ObservableBooksApi {
     }
 
     /**
-     * @param bookId
-     * @param page
-     * @param limit
-     * @param [userId]
-     * @param [rate]
+     * @param bookId 
+     * @param page 
+     * @param limit 
+     * @param userId 
+     * @param rate 
      */
-    public bookControllerFindUserBookReviews(bookId: string, page: number, limit: number, userId?: string, rate?: Array<number>, _options?: ConfigurationOptions): Observable<UserBooksResponseDto> {
+    public bookControllerFindUserBookReviews(bookId: string, page: number, limit: number, userId?: string, rate?: Array<number>, _options?: Configuration): Observable<UserBooksResponseDto> {
         return this.bookControllerFindUserBookReviewsWithHttpInfo(bookId, page, limit, userId, rate, _options).pipe(map((apiResponse: HttpInfo<UserBooksResponseDto>) => apiResponse.data));
     }
 
     /**
      */
-    public bookControllerFindUserWhichReadBookWithHttpInfo(_options?: ConfigurationOptions): Observable<HttpInfo<UserBooksResponseDto>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public bookControllerFindUserWhichReadBookWithHttpInfo(_options?: Configuration): Observable<HttpInfo<UserBooksResponseDto>> {
+        const requestContextPromise = this.requestFactory.bookControllerFindUserWhichReadBook(_options);
 
-        const requestContextPromise = this.requestFactory.bookControllerFindUserWhichReadBook(_config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.bookControllerFindUserWhichReadBookWithHttpInfo(rsp)));
@@ -1951,27 +1894,26 @@ export class ObservableBooksApi {
 
     /**
      */
-    public bookControllerFindUserWhichReadBook(_options?: ConfigurationOptions): Observable<UserBooksResponseDto> {
+    public bookControllerFindUserWhichReadBook(_options?: Configuration): Observable<UserBooksResponseDto> {
         return this.bookControllerFindUserWhichReadBookWithHttpInfo(_options).pipe(map((apiResponse: HttpInfo<UserBooksResponseDto>) => apiResponse.data));
     }
 
     /**
-     * @param topBookPayload
+     * @param topBookPayload 
      */
-    public bookControllerRemoveTopBookWithHttpInfo(topBookPayload: TopBookPayload, _options?: ConfigurationOptions): Observable<HttpInfo<void>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public bookControllerRemoveTopBookWithHttpInfo(topBookPayload: TopBookPayload, _options?: Configuration): Observable<HttpInfo<void>> {
+        const requestContextPromise = this.requestFactory.bookControllerRemoveTopBook(topBookPayload, _options);
 
-        const requestContextPromise = this.requestFactory.bookControllerRemoveTopBook(topBookPayload, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.bookControllerRemoveTopBookWithHttpInfo(rsp)));
@@ -1979,29 +1921,28 @@ export class ObservableBooksApi {
     }
 
     /**
-     * @param topBookPayload
+     * @param topBookPayload 
      */
-    public bookControllerRemoveTopBook(topBookPayload: TopBookPayload, _options?: ConfigurationOptions): Observable<void> {
+    public bookControllerRemoveTopBook(topBookPayload: TopBookPayload, _options?: Configuration): Observable<void> {
         return this.bookControllerRemoveTopBookWithHttpInfo(topBookPayload, _options).pipe(map((apiResponse: HttpInfo<void>) => apiResponse.data));
     }
 
     /**
-     * @param bookPositionDto
+     * @param bookPositionDto 
      */
-    public bookControllerUpdateBookPositionWithHttpInfo(bookPositionDto: BookPositionDto, _options?: ConfigurationOptions): Observable<HttpInfo<BookResponseDto>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public bookControllerUpdateBookPositionWithHttpInfo(bookPositionDto: BookPositionDto, _options?: Configuration): Observable<HttpInfo<BookResponseDto>> {
+        const requestContextPromise = this.requestFactory.bookControllerUpdateBookPosition(bookPositionDto, _options);
 
-        const requestContextPromise = this.requestFactory.bookControllerUpdateBookPosition(bookPositionDto, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.bookControllerUpdateBookPositionWithHttpInfo(rsp)));
@@ -2009,29 +1950,28 @@ export class ObservableBooksApi {
     }
 
     /**
-     * @param bookPositionDto
+     * @param bookPositionDto 
      */
-    public bookControllerUpdateBookPosition(bookPositionDto: BookPositionDto, _options?: ConfigurationOptions): Observable<BookResponseDto> {
+    public bookControllerUpdateBookPosition(bookPositionDto: BookPositionDto, _options?: Configuration): Observable<BookResponseDto> {
         return this.bookControllerUpdateBookPositionWithHttpInfo(bookPositionDto, _options).pipe(map((apiResponse: HttpInfo<BookResponseDto>) => apiResponse.data));
     }
 
     /**
-     * @param userBookPayloadDto
+     * @param userBookPayloadDto 
      */
-    public bookControllerUserBookMarkWithHttpInfo(userBookPayloadDto: UserBookPayloadDto, _options?: ConfigurationOptions): Observable<HttpInfo<UserBookReviewResponseDto>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public bookControllerUserBookMarkWithHttpInfo(userBookPayloadDto: UserBookPayloadDto, _options?: Configuration): Observable<HttpInfo<UserBookReviewResponseDto>> {
+        const requestContextPromise = this.requestFactory.bookControllerUserBookMark(userBookPayloadDto, _options);
 
-        const requestContextPromise = this.requestFactory.bookControllerUserBookMark(userBookPayloadDto, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.bookControllerUserBookMarkWithHttpInfo(rsp)));
@@ -2039,9 +1979,9 @@ export class ObservableBooksApi {
     }
 
     /**
-     * @param userBookPayloadDto
+     * @param userBookPayloadDto 
      */
-    public bookControllerUserBookMark(userBookPayloadDto: UserBookPayloadDto, _options?: ConfigurationOptions): Observable<UserBookReviewResponseDto> {
+    public bookControllerUserBookMark(userBookPayloadDto: UserBookPayloadDto, _options?: Configuration): Observable<UserBookReviewResponseDto> {
         return this.bookControllerUserBookMarkWithHttpInfo(userBookPayloadDto, _options).pipe(map((apiResponse: HttpInfo<UserBookReviewResponseDto>) => apiResponse.data));
     }
 
@@ -2064,22 +2004,21 @@ export class ObservableContactApi {
     }
 
     /**
-     * @param contactDetails
+     * @param contactDetails 
      */
-    public contactControllerSyncContactsWithHttpInfo(contactDetails: Array<ContactDetails>, _options?: ConfigurationOptions): Observable<HttpInfo<ContactDetailsDto>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public contactControllerSyncContactsWithHttpInfo(contactDetails: Array<ContactDetails>, _options?: Configuration): Observable<HttpInfo<ContactDetailsDto>> {
+        const requestContextPromise = this.requestFactory.contactControllerSyncContacts(contactDetails, _options);
 
-        const requestContextPromise = this.requestFactory.contactControllerSyncContacts(contactDetails, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.contactControllerSyncContactsWithHttpInfo(rsp)));
@@ -2087,9 +2026,9 @@ export class ObservableContactApi {
     }
 
     /**
-     * @param contactDetails
+     * @param contactDetails 
      */
-    public contactControllerSyncContacts(contactDetails: Array<ContactDetails>, _options?: ConfigurationOptions): Observable<ContactDetailsDto> {
+    public contactControllerSyncContacts(contactDetails: Array<ContactDetails>, _options?: Configuration): Observable<ContactDetailsDto> {
         return this.contactControllerSyncContactsWithHttpInfo(contactDetails, _options).pipe(map((apiResponse: HttpInfo<ContactDetailsDto>) => apiResponse.data));
     }
 
@@ -2113,20 +2052,19 @@ export class ObservableDefaultApi {
 
     /**
      */
-    public appControllerGetHelloWithHttpInfo(_options?: ConfigurationOptions): Observable<HttpInfo<void>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public appControllerGetHelloWithHttpInfo(_options?: Configuration): Observable<HttpInfo<void>> {
+        const requestContextPromise = this.requestFactory.appControllerGetHello(_options);
 
-        const requestContextPromise = this.requestFactory.appControllerGetHello(_config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.appControllerGetHelloWithHttpInfo(rsp)));
@@ -2135,7 +2073,7 @@ export class ObservableDefaultApi {
 
     /**
      */
-    public appControllerGetHello(_options?: ConfigurationOptions): Observable<void> {
+    public appControllerGetHello(_options?: Configuration): Observable<void> {
         return this.appControllerGetHelloWithHttpInfo(_options).pipe(map((apiResponse: HttpInfo<void>) => apiResponse.data));
     }
 
@@ -2158,22 +2096,21 @@ export class ObservableDeviceApi {
     }
 
     /**
-     * @param addDevicePayload
+     * @param addDevicePayload 
      */
-    public deviceControllerAddDeviceWithHttpInfo(addDevicePayload: AddDevicePayload, _options?: ConfigurationOptions): Observable<HttpInfo<DeviceAddResponse>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public deviceControllerAddDeviceWithHttpInfo(addDevicePayload: AddDevicePayload, _options?: Configuration): Observable<HttpInfo<DeviceAddResponse>> {
+        const requestContextPromise = this.requestFactory.deviceControllerAddDevice(addDevicePayload, _options);
 
-        const requestContextPromise = this.requestFactory.deviceControllerAddDevice(addDevicePayload, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.deviceControllerAddDeviceWithHttpInfo(rsp)));
@@ -2181,9 +2118,9 @@ export class ObservableDeviceApi {
     }
 
     /**
-     * @param addDevicePayload
+     * @param addDevicePayload 
      */
-    public deviceControllerAddDevice(addDevicePayload: AddDevicePayload, _options?: ConfigurationOptions): Observable<DeviceAddResponse> {
+    public deviceControllerAddDevice(addDevicePayload: AddDevicePayload, _options?: Configuration): Observable<DeviceAddResponse> {
         return this.deviceControllerAddDeviceWithHttpInfo(addDevicePayload, _options).pipe(map((apiResponse: HttpInfo<DeviceAddResponse>) => apiResponse.data));
     }
 
@@ -2206,22 +2143,21 @@ export class ObservableEventsApi {
     }
 
     /**
-     * @param bookMarkEventPayloadDto
+     * @param bookMarkEventPayloadDto 
      */
-    public eventControllerBookMarkEventWithHttpInfo(bookMarkEventPayloadDto: BookMarkEventPayloadDto, _options?: ConfigurationOptions): Observable<HttpInfo<CreateBookMarkEventResponseDto>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public eventControllerBookMarkEventWithHttpInfo(bookMarkEventPayloadDto: BookMarkEventPayloadDto, _options?: Configuration): Observable<HttpInfo<CreateBookMarkEventResponseDto>> {
+        const requestContextPromise = this.requestFactory.eventControllerBookMarkEvent(bookMarkEventPayloadDto, _options);
 
-        const requestContextPromise = this.requestFactory.eventControllerBookMarkEvent(bookMarkEventPayloadDto, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.eventControllerBookMarkEventWithHttpInfo(rsp)));
@@ -2229,31 +2165,30 @@ export class ObservableEventsApi {
     }
 
     /**
-     * @param bookMarkEventPayloadDto
+     * @param bookMarkEventPayloadDto 
      */
-    public eventControllerBookMarkEvent(bookMarkEventPayloadDto: BookMarkEventPayloadDto, _options?: ConfigurationOptions): Observable<CreateBookMarkEventResponseDto> {
+    public eventControllerBookMarkEvent(bookMarkEventPayloadDto: BookMarkEventPayloadDto, _options?: Configuration): Observable<CreateBookMarkEventResponseDto> {
         return this.eventControllerBookMarkEventWithHttpInfo(bookMarkEventPayloadDto, _options).pipe(map((apiResponse: HttpInfo<CreateBookMarkEventResponseDto>) => apiResponse.data));
     }
 
     /**
-     * @param page
-     * @param [limit]
-     * @param [userId]
+     * @param page 
+     * @param limit 
+     * @param userId 
      */
-    public eventControllerBookMarkEventListWithHttpInfo(page: number, limit?: number, userId?: string, _options?: ConfigurationOptions): Observable<HttpInfo<BookMarkEventListResponseDto>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public eventControllerBookMarkEventListWithHttpInfo(page: number, limit?: number, userId?: string, _options?: Configuration): Observable<HttpInfo<BookMarkEventListResponseDto>> {
+        const requestContextPromise = this.requestFactory.eventControllerBookMarkEventList(page, limit, userId, _options);
 
-        const requestContextPromise = this.requestFactory.eventControllerBookMarkEventList(page, limit, userId, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.eventControllerBookMarkEventListWithHttpInfo(rsp)));
@@ -2261,31 +2196,30 @@ export class ObservableEventsApi {
     }
 
     /**
-     * @param page
-     * @param [limit]
-     * @param [userId]
+     * @param page 
+     * @param limit 
+     * @param userId 
      */
-    public eventControllerBookMarkEventList(page: number, limit?: number, userId?: string, _options?: ConfigurationOptions): Observable<BookMarkEventListResponseDto> {
+    public eventControllerBookMarkEventList(page: number, limit?: number, userId?: string, _options?: Configuration): Observable<BookMarkEventListResponseDto> {
         return this.eventControllerBookMarkEventListWithHttpInfo(page, limit, userId, _options).pipe(map((apiResponse: HttpInfo<BookMarkEventListResponseDto>) => apiResponse.data));
     }
 
     /**
-     * @param eventPayloadDto
+     * @param eventPayloadDto 
      */
-    public eventControllerCreateEventWithHttpInfo(eventPayloadDto: EventPayloadDto, _options?: ConfigurationOptions): Observable<HttpInfo<EventResponseDto>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public eventControllerCreateEventWithHttpInfo(eventPayloadDto: EventPayloadDto, _options?: Configuration): Observable<HttpInfo<EventResponseDto>> {
+        const requestContextPromise = this.requestFactory.eventControllerCreateEvent(eventPayloadDto, _options);
 
-        const requestContextPromise = this.requestFactory.eventControllerCreateEvent(eventPayloadDto, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.eventControllerCreateEventWithHttpInfo(rsp)));
@@ -2293,29 +2227,28 @@ export class ObservableEventsApi {
     }
 
     /**
-     * @param eventPayloadDto
+     * @param eventPayloadDto 
      */
-    public eventControllerCreateEvent(eventPayloadDto: EventPayloadDto, _options?: ConfigurationOptions): Observable<EventResponseDto> {
+    public eventControllerCreateEvent(eventPayloadDto: EventPayloadDto, _options?: Configuration): Observable<EventResponseDto> {
         return this.eventControllerCreateEventWithHttpInfo(eventPayloadDto, _options).pipe(map((apiResponse: HttpInfo<EventResponseDto>) => apiResponse.data));
     }
 
     /**
-     * @param myEventsPayloadDTO
+     * @param myEventsPayloadDTO 
      */
-    public eventControllerCreateMyEventsWithHttpInfo(myEventsPayloadDTO: MyEventsPayloadDTO, _options?: ConfigurationOptions): Observable<HttpInfo<MyEventResponseDto>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public eventControllerCreateMyEventsWithHttpInfo(myEventsPayloadDTO: MyEventsPayloadDTO, _options?: Configuration): Observable<HttpInfo<MyEventResponseDto>> {
+        const requestContextPromise = this.requestFactory.eventControllerCreateMyEvents(myEventsPayloadDTO, _options);
 
-        const requestContextPromise = this.requestFactory.eventControllerCreateMyEvents(myEventsPayloadDTO, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.eventControllerCreateMyEventsWithHttpInfo(rsp)));
@@ -2323,29 +2256,28 @@ export class ObservableEventsApi {
     }
 
     /**
-     * @param myEventsPayloadDTO
+     * @param myEventsPayloadDTO 
      */
-    public eventControllerCreateMyEvents(myEventsPayloadDTO: MyEventsPayloadDTO, _options?: ConfigurationOptions): Observable<MyEventResponseDto> {
+    public eventControllerCreateMyEvents(myEventsPayloadDTO: MyEventsPayloadDTO, _options?: Configuration): Observable<MyEventResponseDto> {
         return this.eventControllerCreateMyEventsWithHttpInfo(myEventsPayloadDTO, _options).pipe(map((apiResponse: HttpInfo<MyEventResponseDto>) => apiResponse.data));
     }
 
     /**
-     * @param eventId
+     * @param eventId 
      */
-    public eventControllerDeleteBookMarkEventWithHttpInfo(eventId: string, _options?: ConfigurationOptions): Observable<HttpInfo<DeleteBookMarkEventResponseDto>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public eventControllerDeleteBookMarkEventWithHttpInfo(eventId: string, _options?: Configuration): Observable<HttpInfo<DeleteBookMarkEventResponseDto>> {
+        const requestContextPromise = this.requestFactory.eventControllerDeleteBookMarkEvent(eventId, _options);
 
-        const requestContextPromise = this.requestFactory.eventControllerDeleteBookMarkEvent(eventId, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.eventControllerDeleteBookMarkEventWithHttpInfo(rsp)));
@@ -2353,30 +2285,29 @@ export class ObservableEventsApi {
     }
 
     /**
-     * @param eventId
+     * @param eventId 
      */
-    public eventControllerDeleteBookMarkEvent(eventId: string, _options?: ConfigurationOptions): Observable<DeleteBookMarkEventResponseDto> {
+    public eventControllerDeleteBookMarkEvent(eventId: string, _options?: Configuration): Observable<DeleteBookMarkEventResponseDto> {
         return this.eventControllerDeleteBookMarkEventWithHttpInfo(eventId, _options).pipe(map((apiResponse: HttpInfo<DeleteBookMarkEventResponseDto>) => apiResponse.data));
     }
 
     /**
-     * @param id
-     * @param [withBookedEvent]
+     * @param id 
+     * @param withBookedEvent 
      */
-    public eventControllerDeleteEventWithHttpInfo(id: string, withBookedEvent?: boolean, _options?: ConfigurationOptions): Observable<HttpInfo<EventDeleteResponseDto>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public eventControllerDeleteEventWithHttpInfo(id: string, withBookedEvent?: boolean, _options?: Configuration): Observable<HttpInfo<EventDeleteResponseDto>> {
+        const requestContextPromise = this.requestFactory.eventControllerDeleteEvent(id, withBookedEvent, _options);
 
-        const requestContextPromise = this.requestFactory.eventControllerDeleteEvent(id, withBookedEvent, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.eventControllerDeleteEventWithHttpInfo(rsp)));
@@ -2384,30 +2315,29 @@ export class ObservableEventsApi {
     }
 
     /**
-     * @param id
-     * @param [withBookedEvent]
+     * @param id 
+     * @param withBookedEvent 
      */
-    public eventControllerDeleteEvent(id: string, withBookedEvent?: boolean, _options?: ConfigurationOptions): Observable<EventDeleteResponseDto> {
+    public eventControllerDeleteEvent(id: string, withBookedEvent?: boolean, _options?: Configuration): Observable<EventDeleteResponseDto> {
         return this.eventControllerDeleteEventWithHttpInfo(id, withBookedEvent, _options).pipe(map((apiResponse: HttpInfo<EventDeleteResponseDto>) => apiResponse.data));
     }
 
     /**
-     * @param userId
+     * @param userId 
      */
-    public eventControllerFindCustomerOfEventsWithHttpInfo(userId: string, _options?: ConfigurationOptions): Observable<HttpInfo<EventCustomerResponseDto>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public eventControllerFindCustomerOfEventsWithHttpInfo(userId: string, _options?: Configuration): Observable<HttpInfo<EventCustomerResponseDto>> {
+        const requestContextPromise = this.requestFactory.eventControllerFindCustomerOfEvents(userId, _options);
 
-        const requestContextPromise = this.requestFactory.eventControllerFindCustomerOfEvents(userId, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.eventControllerFindCustomerOfEventsWithHttpInfo(rsp)));
@@ -2415,30 +2345,29 @@ export class ObservableEventsApi {
     }
 
     /**
-     * @param userId
+     * @param userId 
      */
-    public eventControllerFindCustomerOfEvents(userId: string, _options?: ConfigurationOptions): Observable<EventCustomerResponseDto> {
+    public eventControllerFindCustomerOfEvents(userId: string, _options?: Configuration): Observable<EventCustomerResponseDto> {
         return this.eventControllerFindCustomerOfEventsWithHttpInfo(userId, _options).pipe(map((apiResponse: HttpInfo<EventCustomerResponseDto>) => apiResponse.data));
     }
 
     /**
-     * @param id
-     * @param [withBookedEvent]
+     * @param id 
+     * @param withBookedEvent 
      */
-    public eventControllerFindEventByIdWithHttpInfo(id: string, withBookedEvent?: boolean, _options?: ConfigurationOptions): Observable<HttpInfo<EventResponseDto>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public eventControllerFindEventByIdWithHttpInfo(id: string, withBookedEvent?: boolean, _options?: Configuration): Observable<HttpInfo<EventResponseDto>> {
+        const requestContextPromise = this.requestFactory.eventControllerFindEventById(id, withBookedEvent, _options);
 
-        const requestContextPromise = this.requestFactory.eventControllerFindEventById(id, withBookedEvent, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.eventControllerFindEventByIdWithHttpInfo(rsp)));
@@ -2446,35 +2375,34 @@ export class ObservableEventsApi {
     }
 
     /**
-     * @param id
-     * @param [withBookedEvent]
+     * @param id 
+     * @param withBookedEvent 
      */
-    public eventControllerFindEventById(id: string, withBookedEvent?: boolean, _options?: ConfigurationOptions): Observable<EventResponseDto> {
+    public eventControllerFindEventById(id: string, withBookedEvent?: boolean, _options?: Configuration): Observable<EventResponseDto> {
         return this.eventControllerFindEventByIdWithHttpInfo(id, withBookedEvent, _options).pipe(map((apiResponse: HttpInfo<EventResponseDto>) => apiResponse.data));
     }
 
     /**
-     * @param page
-     * @param [limit]
-     * @param [longitude]
-     * @param [latitude]
-     * @param [userId]
-     * @param [search]
+     * @param page 
+     * @param limit 
+     * @param longitude 
+     * @param latitude 
+     * @param userId 
+     * @param search 
      */
-    public eventControllerFindEventsWithHttpInfo(page: number, limit?: number, longitude?: number, latitude?: number, userId?: string, search?: string, _options?: ConfigurationOptions): Observable<HttpInfo<EventsResponseDto>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public eventControllerFindEventsWithHttpInfo(page: number, limit?: number, longitude?: number, latitude?: number, userId?: string, search?: string, _options?: Configuration): Observable<HttpInfo<EventsResponseDto>> {
+        const requestContextPromise = this.requestFactory.eventControllerFindEvents(page, limit, longitude, latitude, userId, search, _options);
 
-        const requestContextPromise = this.requestFactory.eventControllerFindEvents(page, limit, longitude, latitude, userId, search, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.eventControllerFindEventsWithHttpInfo(rsp)));
@@ -2482,34 +2410,33 @@ export class ObservableEventsApi {
     }
 
     /**
-     * @param page
-     * @param [limit]
-     * @param [longitude]
-     * @param [latitude]
-     * @param [userId]
-     * @param [search]
+     * @param page 
+     * @param limit 
+     * @param longitude 
+     * @param latitude 
+     * @param userId 
+     * @param search 
      */
-    public eventControllerFindEvents(page: number, limit?: number, longitude?: number, latitude?: number, userId?: string, search?: string, _options?: ConfigurationOptions): Observable<EventsResponseDto> {
+    public eventControllerFindEvents(page: number, limit?: number, longitude?: number, latitude?: number, userId?: string, search?: string, _options?: Configuration): Observable<EventsResponseDto> {
         return this.eventControllerFindEventsWithHttpInfo(page, limit, longitude, latitude, userId, search, _options).pipe(map((apiResponse: HttpInfo<EventsResponseDto>) => apiResponse.data));
     }
 
     /**
-     * @param eventId
+     * @param eventId 
      */
-    public eventControllerFindMyEventWithHttpInfo(eventId: string, _options?: ConfigurationOptions): Observable<HttpInfo<MyEventResponseDto>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public eventControllerFindMyEventWithHttpInfo(eventId: string, _options?: Configuration): Observable<HttpInfo<MyEventResponseDto>> {
+        const requestContextPromise = this.requestFactory.eventControllerFindMyEvent(eventId, _options);
 
-        const requestContextPromise = this.requestFactory.eventControllerFindMyEvent(eventId, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.eventControllerFindMyEventWithHttpInfo(rsp)));
@@ -2517,31 +2444,30 @@ export class ObservableEventsApi {
     }
 
     /**
-     * @param eventId
+     * @param eventId 
      */
-    public eventControllerFindMyEvent(eventId: string, _options?: ConfigurationOptions): Observable<MyEventResponseDto> {
+    public eventControllerFindMyEvent(eventId: string, _options?: Configuration): Observable<MyEventResponseDto> {
         return this.eventControllerFindMyEventWithHttpInfo(eventId, _options).pipe(map((apiResponse: HttpInfo<MyEventResponseDto>) => apiResponse.data));
     }
 
     /**
-     * @param page
-     * @param limit
-     * @param type
+     * @param page 
+     * @param limit 
+     * @param type 
      */
-    public eventControllerFindMyUpcomingEventsWithHttpInfo(page: number, limit: number, type: 'UPCOMING' | 'VISITED', _options?: ConfigurationOptions): Observable<HttpInfo<MyEventsResponseDto>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public eventControllerFindMyUpcomingEventsWithHttpInfo(page: number, limit: number, type: 'UPCOMING' | 'VISITED', _options?: Configuration): Observable<HttpInfo<MyEventsResponseDto>> {
+        const requestContextPromise = this.requestFactory.eventControllerFindMyUpcomingEvents(page, limit, type, _options);
 
-        const requestContextPromise = this.requestFactory.eventControllerFindMyUpcomingEvents(page, limit, type, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.eventControllerFindMyUpcomingEventsWithHttpInfo(rsp)));
@@ -2549,31 +2475,30 @@ export class ObservableEventsApi {
     }
 
     /**
-     * @param page
-     * @param limit
-     * @param type
+     * @param page 
+     * @param limit 
+     * @param type 
      */
-    public eventControllerFindMyUpcomingEvents(page: number, limit: number, type: 'UPCOMING' | 'VISITED', _options?: ConfigurationOptions): Observable<MyEventsResponseDto> {
+    public eventControllerFindMyUpcomingEvents(page: number, limit: number, type: 'UPCOMING' | 'VISITED', _options?: Configuration): Observable<MyEventsResponseDto> {
         return this.eventControllerFindMyUpcomingEventsWithHttpInfo(page, limit, type, _options).pipe(map((apiResponse: HttpInfo<MyEventsResponseDto>) => apiResponse.data));
     }
 
     /**
-     * @param locationPayloadDto
+     * @param locationPayloadDto 
      */
-    public eventControllerFindSearchPlacesWithHttpInfo(locationPayloadDto: LocationPayloadDto, _options?: ConfigurationOptions): Observable<HttpInfo<LocationPlacesResponseDto>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public eventControllerFindSearchPlacesWithHttpInfo(locationPayloadDto: LocationPayloadDto, _options?: Configuration): Observable<HttpInfo<LocationPlacesResponseDto>> {
+        const requestContextPromise = this.requestFactory.eventControllerFindSearchPlaces(locationPayloadDto, _options);
 
-        const requestContextPromise = this.requestFactory.eventControllerFindSearchPlaces(locationPayloadDto, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.eventControllerFindSearchPlacesWithHttpInfo(rsp)));
@@ -2581,29 +2506,28 @@ export class ObservableEventsApi {
     }
 
     /**
-     * @param locationPayloadDto
+     * @param locationPayloadDto 
      */
-    public eventControllerFindSearchPlaces(locationPayloadDto: LocationPayloadDto, _options?: ConfigurationOptions): Observable<LocationPlacesResponseDto> {
+    public eventControllerFindSearchPlaces(locationPayloadDto: LocationPayloadDto, _options?: Configuration): Observable<LocationPlacesResponseDto> {
         return this.eventControllerFindSearchPlacesWithHttpInfo(locationPayloadDto, _options).pipe(map((apiResponse: HttpInfo<LocationPlacesResponseDto>) => apiResponse.data));
     }
 
     /**
-     * @param eventId
+     * @param eventId 
      */
-    public eventControllerGetBookMarkEventStatusWithHttpInfo(eventId: string, _options?: ConfigurationOptions): Observable<HttpInfo<BookMarkEventStatusResponseDto>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public eventControllerGetBookMarkEventStatusWithHttpInfo(eventId: string, _options?: Configuration): Observable<HttpInfo<BookMarkEventStatusResponseDto>> {
+        const requestContextPromise = this.requestFactory.eventControllerGetBookMarkEventStatus(eventId, _options);
 
-        const requestContextPromise = this.requestFactory.eventControllerGetBookMarkEventStatus(eventId, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.eventControllerGetBookMarkEventStatusWithHttpInfo(rsp)));
@@ -2611,29 +2535,28 @@ export class ObservableEventsApi {
     }
 
     /**
-     * @param eventId
+     * @param eventId 
      */
-    public eventControllerGetBookMarkEventStatus(eventId: string, _options?: ConfigurationOptions): Observable<BookMarkEventStatusResponseDto> {
+    public eventControllerGetBookMarkEventStatus(eventId: string, _options?: Configuration): Observable<BookMarkEventStatusResponseDto> {
         return this.eventControllerGetBookMarkEventStatusWithHttpInfo(eventId, _options).pipe(map((apiResponse: HttpInfo<BookMarkEventStatusResponseDto>) => apiResponse.data));
     }
 
     /**
-     * @param eventPayloadDto
+     * @param eventPayloadDto 
      */
-    public eventControllerUpdateEventWithHttpInfo(eventPayloadDto: EventPayloadDto, _options?: ConfigurationOptions): Observable<HttpInfo<EventResponseDto>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public eventControllerUpdateEventWithHttpInfo(eventPayloadDto: EventPayloadDto, _options?: Configuration): Observable<HttpInfo<EventResponseDto>> {
+        const requestContextPromise = this.requestFactory.eventControllerUpdateEvent(eventPayloadDto, _options);
 
-        const requestContextPromise = this.requestFactory.eventControllerUpdateEvent(eventPayloadDto, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.eventControllerUpdateEventWithHttpInfo(rsp)));
@@ -2641,9 +2564,9 @@ export class ObservableEventsApi {
     }
 
     /**
-     * @param eventPayloadDto
+     * @param eventPayloadDto 
      */
-    public eventControllerUpdateEvent(eventPayloadDto: EventPayloadDto, _options?: ConfigurationOptions): Observable<EventResponseDto> {
+    public eventControllerUpdateEvent(eventPayloadDto: EventPayloadDto, _options?: Configuration): Observable<EventResponseDto> {
         return this.eventControllerUpdateEventWithHttpInfo(eventPayloadDto, _options).pipe(map((apiResponse: HttpInfo<EventResponseDto>) => apiResponse.data));
     }
 
@@ -2666,22 +2589,21 @@ export class ObservableFollowerApi {
     }
 
     /**
-     * @param acceptFollowerPayloadDto
+     * @param acceptFollowerPayloadDto 
      */
-    public followerControllerAcceptWithHttpInfo(acceptFollowerPayloadDto: AcceptFollowerPayloadDto, _options?: ConfigurationOptions): Observable<HttpInfo<FollowerResponseDto>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public followerControllerAcceptWithHttpInfo(acceptFollowerPayloadDto: AcceptFollowerPayloadDto, _options?: Configuration): Observable<HttpInfo<FollowerResponseDto>> {
+        const requestContextPromise = this.requestFactory.followerControllerAccept(acceptFollowerPayloadDto, _options);
 
-        const requestContextPromise = this.requestFactory.followerControllerAccept(acceptFollowerPayloadDto, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.followerControllerAcceptWithHttpInfo(rsp)));
@@ -2689,29 +2611,28 @@ export class ObservableFollowerApi {
     }
 
     /**
-     * @param acceptFollowerPayloadDto
+     * @param acceptFollowerPayloadDto 
      */
-    public followerControllerAccept(acceptFollowerPayloadDto: AcceptFollowerPayloadDto, _options?: ConfigurationOptions): Observable<FollowerResponseDto> {
+    public followerControllerAccept(acceptFollowerPayloadDto: AcceptFollowerPayloadDto, _options?: Configuration): Observable<FollowerResponseDto> {
         return this.followerControllerAcceptWithHttpInfo(acceptFollowerPayloadDto, _options).pipe(map((apiResponse: HttpInfo<FollowerResponseDto>) => apiResponse.data));
     }
 
     /**
-     * @param myFriendPayloadDto
+     * @param myFriendPayloadDto 
      */
-    public followerControllerFindMyFriendsWithHttpInfo(myFriendPayloadDto: MyFriendPayloadDto, _options?: ConfigurationOptions): Observable<HttpInfo<MyAllFriendsResponseDto>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public followerControllerFindMyFriendsWithHttpInfo(myFriendPayloadDto: MyFriendPayloadDto, _options?: Configuration): Observable<HttpInfo<MyAllFriendsResponseDto>> {
+        const requestContextPromise = this.requestFactory.followerControllerFindMyFriends(myFriendPayloadDto, _options);
 
-        const requestContextPromise = this.requestFactory.followerControllerFindMyFriends(myFriendPayloadDto, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.followerControllerFindMyFriendsWithHttpInfo(rsp)));
@@ -2719,29 +2640,28 @@ export class ObservableFollowerApi {
     }
 
     /**
-     * @param myFriendPayloadDto
+     * @param myFriendPayloadDto 
      */
-    public followerControllerFindMyFriends(myFriendPayloadDto: MyFriendPayloadDto, _options?: ConfigurationOptions): Observable<MyAllFriendsResponseDto> {
+    public followerControllerFindMyFriends(myFriendPayloadDto: MyFriendPayloadDto, _options?: Configuration): Observable<MyAllFriendsResponseDto> {
         return this.followerControllerFindMyFriendsWithHttpInfo(myFriendPayloadDto, _options).pipe(map((apiResponse: HttpInfo<MyAllFriendsResponseDto>) => apiResponse.data));
     }
 
     /**
-     * @param followerPayloadDto
+     * @param followerPayloadDto 
      */
-    public followerControllerFollowWithHttpInfo(followerPayloadDto: FollowerPayloadDto, _options?: ConfigurationOptions): Observable<HttpInfo<FollowerResponseDto>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public followerControllerFollowWithHttpInfo(followerPayloadDto: FollowerPayloadDto, _options?: Configuration): Observable<HttpInfo<FollowerResponseDto>> {
+        const requestContextPromise = this.requestFactory.followerControllerFollow(followerPayloadDto, _options);
 
-        const requestContextPromise = this.requestFactory.followerControllerFollow(followerPayloadDto, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.followerControllerFollowWithHttpInfo(rsp)));
@@ -2749,28 +2669,27 @@ export class ObservableFollowerApi {
     }
 
     /**
-     * @param followerPayloadDto
+     * @param followerPayloadDto 
      */
-    public followerControllerFollow(followerPayloadDto: FollowerPayloadDto, _options?: ConfigurationOptions): Observable<FollowerResponseDto> {
+    public followerControllerFollow(followerPayloadDto: FollowerPayloadDto, _options?: Configuration): Observable<FollowerResponseDto> {
         return this.followerControllerFollowWithHttpInfo(followerPayloadDto, _options).pipe(map((apiResponse: HttpInfo<FollowerResponseDto>) => apiResponse.data));
     }
 
     /**
      */
-    public followerControllerFriendRequestListWithHttpInfo(_options?: ConfigurationOptions): Observable<HttpInfo<FriendRequestItemEntityDto>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public followerControllerFriendRequestListWithHttpInfo(_options?: Configuration): Observable<HttpInfo<FriendRequestItemEntityDto>> {
+        const requestContextPromise = this.requestFactory.followerControllerFriendRequestList(_options);
 
-        const requestContextPromise = this.requestFactory.followerControllerFriendRequestList(_config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.followerControllerFriendRequestListWithHttpInfo(rsp)));
@@ -2779,27 +2698,26 @@ export class ObservableFollowerApi {
 
     /**
      */
-    public followerControllerFriendRequestList(_options?: ConfigurationOptions): Observable<FriendRequestItemEntityDto> {
+    public followerControllerFriendRequestList(_options?: Configuration): Observable<FriendRequestItemEntityDto> {
         return this.followerControllerFriendRequestListWithHttpInfo(_options).pipe(map((apiResponse: HttpInfo<FriendRequestItemEntityDto>) => apiResponse.data));
     }
 
     /**
-     * @param followerPayloadDto
+     * @param followerPayloadDto 
      */
-    public followerControllerIsFriendWithHttpInfo(followerPayloadDto: FollowerPayloadDto, _options?: ConfigurationOptions): Observable<HttpInfo<FollowerResponseDto>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public followerControllerIsFriendWithHttpInfo(followerPayloadDto: FollowerPayloadDto, _options?: Configuration): Observable<HttpInfo<FollowerResponseDto>> {
+        const requestContextPromise = this.requestFactory.followerControllerIsFriend(followerPayloadDto, _options);
 
-        const requestContextPromise = this.requestFactory.followerControllerIsFriend(followerPayloadDto, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.followerControllerIsFriendWithHttpInfo(rsp)));
@@ -2807,29 +2725,28 @@ export class ObservableFollowerApi {
     }
 
     /**
-     * @param followerPayloadDto
+     * @param followerPayloadDto 
      */
-    public followerControllerIsFriend(followerPayloadDto: FollowerPayloadDto, _options?: ConfigurationOptions): Observable<FollowerResponseDto> {
+    public followerControllerIsFriend(followerPayloadDto: FollowerPayloadDto, _options?: Configuration): Observable<FollowerResponseDto> {
         return this.followerControllerIsFriendWithHttpInfo(followerPayloadDto, _options).pipe(map((apiResponse: HttpInfo<FollowerResponseDto>) => apiResponse.data));
     }
 
     /**
-     * @param followerPayloadDto
+     * @param followerPayloadDto 
      */
-    public followerControllerUnfollowWithHttpInfo(followerPayloadDto: FollowerPayloadDto, _options?: ConfigurationOptions): Observable<HttpInfo<FollowerResponseDto>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public followerControllerUnfollowWithHttpInfo(followerPayloadDto: FollowerPayloadDto, _options?: Configuration): Observable<HttpInfo<FollowerResponseDto>> {
+        const requestContextPromise = this.requestFactory.followerControllerUnfollow(followerPayloadDto, _options);
 
-        const requestContextPromise = this.requestFactory.followerControllerUnfollow(followerPayloadDto, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.followerControllerUnfollowWithHttpInfo(rsp)));
@@ -2837,9 +2754,9 @@ export class ObservableFollowerApi {
     }
 
     /**
-     * @param followerPayloadDto
+     * @param followerPayloadDto 
      */
-    public followerControllerUnfollow(followerPayloadDto: FollowerPayloadDto, _options?: ConfigurationOptions): Observable<FollowerResponseDto> {
+    public followerControllerUnfollow(followerPayloadDto: FollowerPayloadDto, _options?: Configuration): Observable<FollowerResponseDto> {
         return this.followerControllerUnfollowWithHttpInfo(followerPayloadDto, _options).pipe(map((apiResponse: HttpInfo<FollowerResponseDto>) => apiResponse.data));
     }
 
@@ -2862,24 +2779,23 @@ export class ObservableFriendsApi {
     }
 
     /**
-     * @param page
-     * @param limit
-     * @param [search]
+     * @param page 
+     * @param limit 
+     * @param search 
      */
-    public friendControllerFindFriendsWithHttpInfo(page: number, limit: number, search?: string, _options?: ConfigurationOptions): Observable<HttpInfo<FriendsResponseDto>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public friendControllerFindFriendsWithHttpInfo(page: number, limit: number, search?: string, _options?: Configuration): Observable<HttpInfo<FriendsResponseDto>> {
+        const requestContextPromise = this.requestFactory.friendControllerFindFriends(page, limit, search, _options);
 
-        const requestContextPromise = this.requestFactory.friendControllerFindFriends(page, limit, search, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.friendControllerFindFriendsWithHttpInfo(rsp)));
@@ -2887,11 +2803,11 @@ export class ObservableFriendsApi {
     }
 
     /**
-     * @param page
-     * @param limit
-     * @param [search]
+     * @param page 
+     * @param limit 
+     * @param search 
      */
-    public friendControllerFindFriends(page: number, limit: number, search?: string, _options?: ConfigurationOptions): Observable<FriendsResponseDto> {
+    public friendControllerFindFriends(page: number, limit: number, search?: string, _options?: Configuration): Observable<FriendsResponseDto> {
         return this.friendControllerFindFriendsWithHttpInfo(page, limit, search, _options).pipe(map((apiResponse: HttpInfo<FriendsResponseDto>) => apiResponse.data));
     }
 
@@ -2914,23 +2830,22 @@ export class ObservableNielsenBooksApi {
     }
 
     /**
-     * @param id
-     * @param body
+     * @param id 
+     * @param body 
      */
-    public nielsenBooksControllerGetNielsenBookByIdWithHttpInfo(id: string, body: any, _options?: ConfigurationOptions): Observable<HttpInfo<void>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public nielsenBooksControllerGetNielsenBookByIdWithHttpInfo(id: string, body: any, _options?: Configuration): Observable<HttpInfo<void>> {
+        const requestContextPromise = this.requestFactory.nielsenBooksControllerGetNielsenBookById(id, body, _options);
 
-        const requestContextPromise = this.requestFactory.nielsenBooksControllerGetNielsenBookById(id, body, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.nielsenBooksControllerGetNielsenBookByIdWithHttpInfo(rsp)));
@@ -2938,30 +2853,29 @@ export class ObservableNielsenBooksApi {
     }
 
     /**
-     * @param id
-     * @param body
+     * @param id 
+     * @param body 
      */
-    public nielsenBooksControllerGetNielsenBookById(id: string, body: any, _options?: ConfigurationOptions): Observable<void> {
+    public nielsenBooksControllerGetNielsenBookById(id: string, body: any, _options?: Configuration): Observable<void> {
         return this.nielsenBooksControllerGetNielsenBookByIdWithHttpInfo(id, body, _options).pipe(map((apiResponse: HttpInfo<void>) => apiResponse.data));
     }
 
     /**
-     * @param id
+     * @param id 
      */
-    public nielsenBooksControllerGetNielsenBookImageByIdWithHttpInfo(id: string, _options?: ConfigurationOptions): Observable<HttpInfo<void>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public nielsenBooksControllerGetNielsenBookImageByIdWithHttpInfo(id: string, _options?: Configuration): Observable<HttpInfo<void>> {
+        const requestContextPromise = this.requestFactory.nielsenBooksControllerGetNielsenBookImageById(id, _options);
 
-        const requestContextPromise = this.requestFactory.nielsenBooksControllerGetNielsenBookImageById(id, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.nielsenBooksControllerGetNielsenBookImageByIdWithHttpInfo(rsp)));
@@ -2969,28 +2883,27 @@ export class ObservableNielsenBooksApi {
     }
 
     /**
-     * @param id
+     * @param id 
      */
-    public nielsenBooksControllerGetNielsenBookImageById(id: string, _options?: ConfigurationOptions): Observable<void> {
+    public nielsenBooksControllerGetNielsenBookImageById(id: string, _options?: Configuration): Observable<void> {
         return this.nielsenBooksControllerGetNielsenBookImageByIdWithHttpInfo(id, _options).pipe(map((apiResponse: HttpInfo<void>) => apiResponse.data));
     }
 
     /**
      */
-    public nielsenBooksControllerGetNielsenBooksWithHttpInfo(_options?: ConfigurationOptions): Observable<HttpInfo<void>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public nielsenBooksControllerGetNielsenBooksWithHttpInfo(_options?: Configuration): Observable<HttpInfo<void>> {
+        const requestContextPromise = this.requestFactory.nielsenBooksControllerGetNielsenBooks(_options);
 
-        const requestContextPromise = this.requestFactory.nielsenBooksControllerGetNielsenBooks(_config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.nielsenBooksControllerGetNielsenBooksWithHttpInfo(rsp)));
@@ -2999,7 +2912,7 @@ export class ObservableNielsenBooksApi {
 
     /**
      */
-    public nielsenBooksControllerGetNielsenBooks(_options?: ConfigurationOptions): Observable<void> {
+    public nielsenBooksControllerGetNielsenBooks(_options?: Configuration): Observable<void> {
         return this.nielsenBooksControllerGetNielsenBooksWithHttpInfo(_options).pipe(map((apiResponse: HttpInfo<void>) => apiResponse.data));
     }
 
@@ -3023,20 +2936,19 @@ export class ObservablePaymentApi {
 
     /**
      */
-    public paymentControllerConnectAccountWithHttpInfo(_options?: ConfigurationOptions): Observable<HttpInfo<BusinessConnectedAccount>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public paymentControllerConnectAccountWithHttpInfo(_options?: Configuration): Observable<HttpInfo<BusinessConnectedAccount>> {
+        const requestContextPromise = this.requestFactory.paymentControllerConnectAccount(_options);
 
-        const requestContextPromise = this.requestFactory.paymentControllerConnectAccount(_config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.paymentControllerConnectAccountWithHttpInfo(rsp)));
@@ -3045,26 +2957,25 @@ export class ObservablePaymentApi {
 
     /**
      */
-    public paymentControllerConnectAccount(_options?: ConfigurationOptions): Observable<BusinessConnectedAccount> {
+    public paymentControllerConnectAccount(_options?: Configuration): Observable<BusinessConnectedAccount> {
         return this.paymentControllerConnectAccountWithHttpInfo(_options).pipe(map((apiResponse: HttpInfo<BusinessConnectedAccount>) => apiResponse.data));
     }
 
     /**
      */
-    public paymentControllerCreateAccountVerificationLinkWithHttpInfo(_options?: ConfigurationOptions): Observable<HttpInfo<VerificationLinkResponseDTO>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public paymentControllerCreateAccountVerificationLinkWithHttpInfo(_options?: Configuration): Observable<HttpInfo<VerificationLinkResponseDTO>> {
+        const requestContextPromise = this.requestFactory.paymentControllerCreateAccountVerificationLink(_options);
 
-        const requestContextPromise = this.requestFactory.paymentControllerCreateAccountVerificationLink(_config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.paymentControllerCreateAccountVerificationLinkWithHttpInfo(rsp)));
@@ -3073,27 +2984,26 @@ export class ObservablePaymentApi {
 
     /**
      */
-    public paymentControllerCreateAccountVerificationLink(_options?: ConfigurationOptions): Observable<VerificationLinkResponseDTO> {
+    public paymentControllerCreateAccountVerificationLink(_options?: Configuration): Observable<VerificationLinkResponseDTO> {
         return this.paymentControllerCreateAccountVerificationLinkWithHttpInfo(_options).pipe(map((apiResponse: HttpInfo<VerificationLinkResponseDTO>) => apiResponse.data));
     }
 
     /**
-     * @param stripePaymentPayloadDto
+     * @param stripePaymentPayloadDto 
      */
-    public paymentControllerCreatePaymentWithHttpInfo(stripePaymentPayloadDto: StripePaymentPayloadDto, _options?: ConfigurationOptions): Observable<HttpInfo<PaymentResponseDto>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public paymentControllerCreatePaymentWithHttpInfo(stripePaymentPayloadDto: StripePaymentPayloadDto, _options?: Configuration): Observable<HttpInfo<PaymentResponseDto>> {
+        const requestContextPromise = this.requestFactory.paymentControllerCreatePayment(stripePaymentPayloadDto, _options);
 
-        const requestContextPromise = this.requestFactory.paymentControllerCreatePayment(stripePaymentPayloadDto, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.paymentControllerCreatePaymentWithHttpInfo(rsp)));
@@ -3101,29 +3011,28 @@ export class ObservablePaymentApi {
     }
 
     /**
-     * @param stripePaymentPayloadDto
+     * @param stripePaymentPayloadDto 
      */
-    public paymentControllerCreatePayment(stripePaymentPayloadDto: StripePaymentPayloadDto, _options?: ConfigurationOptions): Observable<PaymentResponseDto> {
+    public paymentControllerCreatePayment(stripePaymentPayloadDto: StripePaymentPayloadDto, _options?: Configuration): Observable<PaymentResponseDto> {
         return this.paymentControllerCreatePaymentWithHttpInfo(stripePaymentPayloadDto, _options).pipe(map((apiResponse: HttpInfo<PaymentResponseDto>) => apiResponse.data));
     }
 
     /**
-     * @param stripePayloadDto
+     * @param stripePayloadDto 
      */
-    public paymentControllerCreatePaymentIntentWithHttpInfo(stripePayloadDto: StripePayloadDto, _options?: ConfigurationOptions): Observable<HttpInfo<StripeResponseDto>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public paymentControllerCreatePaymentIntentWithHttpInfo(stripePayloadDto: StripePayloadDto, _options?: Configuration): Observable<HttpInfo<StripeResponseDto>> {
+        const requestContextPromise = this.requestFactory.paymentControllerCreatePaymentIntent(stripePayloadDto, _options);
 
-        const requestContextPromise = this.requestFactory.paymentControllerCreatePaymentIntent(stripePayloadDto, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.paymentControllerCreatePaymentIntentWithHttpInfo(rsp)));
@@ -3131,29 +3040,28 @@ export class ObservablePaymentApi {
     }
 
     /**
-     * @param stripePayloadDto
+     * @param stripePayloadDto 
      */
-    public paymentControllerCreatePaymentIntent(stripePayloadDto: StripePayloadDto, _options?: ConfigurationOptions): Observable<StripeResponseDto> {
+    public paymentControllerCreatePaymentIntent(stripePayloadDto: StripePayloadDto, _options?: Configuration): Observable<StripeResponseDto> {
         return this.paymentControllerCreatePaymentIntentWithHttpInfo(stripePayloadDto, _options).pipe(map((apiResponse: HttpInfo<StripeResponseDto>) => apiResponse.data));
     }
 
     /**
-     * @param paymentPayloadDto
+     * @param paymentPayloadDto 
      */
-    public paymentControllerDeleteCardDetailsWithHttpInfo(paymentPayloadDto: PaymentPayloadDto, _options?: ConfigurationOptions): Observable<HttpInfo<CardListResponseDto>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public paymentControllerDeleteCardDetailsWithHttpInfo(paymentPayloadDto: PaymentPayloadDto, _options?: Configuration): Observable<HttpInfo<CardListResponseDto>> {
+        const requestContextPromise = this.requestFactory.paymentControllerDeleteCardDetails(paymentPayloadDto, _options);
 
-        const requestContextPromise = this.requestFactory.paymentControllerDeleteCardDetails(paymentPayloadDto, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.paymentControllerDeleteCardDetailsWithHttpInfo(rsp)));
@@ -3161,28 +3069,27 @@ export class ObservablePaymentApi {
     }
 
     /**
-     * @param paymentPayloadDto
+     * @param paymentPayloadDto 
      */
-    public paymentControllerDeleteCardDetails(paymentPayloadDto: PaymentPayloadDto, _options?: ConfigurationOptions): Observable<CardListResponseDto> {
+    public paymentControllerDeleteCardDetails(paymentPayloadDto: PaymentPayloadDto, _options?: Configuration): Observable<CardListResponseDto> {
         return this.paymentControllerDeleteCardDetailsWithHttpInfo(paymentPayloadDto, _options).pipe(map((apiResponse: HttpInfo<CardListResponseDto>) => apiResponse.data));
     }
 
     /**
      */
-    public paymentControllerGetCardListWithHttpInfo(_options?: ConfigurationOptions): Observable<HttpInfo<CardListResponseDto>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public paymentControllerGetCardListWithHttpInfo(_options?: Configuration): Observable<HttpInfo<CardListResponseDto>> {
+        const requestContextPromise = this.requestFactory.paymentControllerGetCardList(_options);
 
-        const requestContextPromise = this.requestFactory.paymentControllerGetCardList(_config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.paymentControllerGetCardListWithHttpInfo(rsp)));
@@ -3191,26 +3098,25 @@ export class ObservablePaymentApi {
 
     /**
      */
-    public paymentControllerGetCardList(_options?: ConfigurationOptions): Observable<CardListResponseDto> {
+    public paymentControllerGetCardList(_options?: Configuration): Observable<CardListResponseDto> {
         return this.paymentControllerGetCardListWithHttpInfo(_options).pipe(map((apiResponse: HttpInfo<CardListResponseDto>) => apiResponse.data));
     }
 
     /**
      */
-    public paymentControllerRetrieveConnectedAccountWithHttpInfo(_options?: ConfigurationOptions): Observable<HttpInfo<BusinessConnectedAccount>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public paymentControllerRetrieveConnectedAccountWithHttpInfo(_options?: Configuration): Observable<HttpInfo<BusinessConnectedAccount>> {
+        const requestContextPromise = this.requestFactory.paymentControllerRetrieveConnectedAccount(_options);
 
-        const requestContextPromise = this.requestFactory.paymentControllerRetrieveConnectedAccount(_config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.paymentControllerRetrieveConnectedAccountWithHttpInfo(rsp)));
@@ -3219,7 +3125,7 @@ export class ObservablePaymentApi {
 
     /**
      */
-    public paymentControllerRetrieveConnectedAccount(_options?: ConfigurationOptions): Observable<BusinessConnectedAccount> {
+    public paymentControllerRetrieveConnectedAccount(_options?: Configuration): Observable<BusinessConnectedAccount> {
         return this.paymentControllerRetrieveConnectedAccountWithHttpInfo(_options).pipe(map((apiResponse: HttpInfo<BusinessConnectedAccount>) => apiResponse.data));
     }
 
@@ -3242,22 +3148,21 @@ export class ObservableStorageApi {
     }
 
     /**
-     * @param fileUploadDto
+     * @param fileUploadDto 
      */
-    public storageControllerGetPreSignedURLWithHttpInfo(fileUploadDto: FileUploadDto, _options?: ConfigurationOptions): Observable<HttpInfo<StorageResponseDto>> {
-        const _config = mergeConfiguration(this.configuration, _options);
+    public storageControllerGetPreSignedURLWithHttpInfo(fileUploadDto: FileUploadDto, _options?: Configuration): Observable<HttpInfo<StorageResponseDto>> {
+        const requestContextPromise = this.requestFactory.storageControllerGetPreSignedURL(fileUploadDto, _options);
 
-        const requestContextPromise = this.requestFactory.storageControllerGetPreSignedURL(fileUploadDto, _config);
         // build promise chain
         let middlewarePreObservable = from<RequestContext>(requestContextPromise);
-        for (const middleware of _config.middleware) {
+        for (let middleware of this.configuration.middleware) {
             middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
         }
 
-        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => this.configuration.httpApi.send(ctx))).
             pipe(mergeMap((response: ResponseContext) => {
                 let middlewarePostObservable = of(response);
-                for (const middleware of _config.middleware.reverse()) {
+                for (let middleware of this.configuration.middleware) {
                     middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
                 }
                 return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.storageControllerGetPreSignedURLWithHttpInfo(rsp)));
@@ -3265,9 +3170,9 @@ export class ObservableStorageApi {
     }
 
     /**
-     * @param fileUploadDto
+     * @param fileUploadDto 
      */
-    public storageControllerGetPreSignedURL(fileUploadDto: FileUploadDto, _options?: ConfigurationOptions): Observable<StorageResponseDto> {
+    public storageControllerGetPreSignedURL(fileUploadDto: FileUploadDto, _options?: Configuration): Observable<StorageResponseDto> {
         return this.storageControllerGetPreSignedURLWithHttpInfo(fileUploadDto, _options).pipe(map((apiResponse: HttpInfo<StorageResponseDto>) => apiResponse.data));
     }
 

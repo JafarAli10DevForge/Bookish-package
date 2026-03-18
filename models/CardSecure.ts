@@ -17,8 +17,6 @@ export class CardSecure {
 
     static readonly discriminator: string | undefined = undefined;
 
-    static readonly mapping: {[index: string]: string} | undefined = undefined;
-
     static readonly attributeTypeMap: Array<{name: string, baseName: string, type: string, format: string}> = [
         {
             "name": "supported",
@@ -34,3 +32,4 @@ export class CardSecure {
     public constructor() {
     }
 }
+
